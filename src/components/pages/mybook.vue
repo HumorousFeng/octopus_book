@@ -71,11 +71,12 @@ import { mapState, mapMutations } from "vuex";
       jumptostartmakeFn(paramobj){
         var this_ = this;
         this_.changeModelTypeId(paramobj.type_id);
+        this_.changeModelTypeName(paramobj.type_name);
         this_.changeModelId(paramobj.template_id);
-        this_.changeModelTypeName(paramobj.book_name);
+        this_.changeModelName(paramobj.book_name);
         this_.changebookid(paramobj.id);
-        this.$router.push({  
-          path: 'startmake',   
+        this.$router.push({
+          path: 'startmake',
           name: 'STARTMAKE',
         }) ;
       },
@@ -103,7 +104,7 @@ import { mapState, mapMutations } from "vuex";
         });
       },
       ...mapMutations([
-        "changeToken","changeModelId","changeModelTypeId","changeModelTypeName","changeEnter","changeGift","changebookid"
+        "changeToken","changeModelId","changeModelName","changeModelTypeId","changeModelTypeName","changeEnter","changeGift","changebookid"
       ])
 
     },

@@ -12,6 +12,7 @@ const state = {
   modeltypeid:"",  //模板类型的id
   modeltypename:"",//模板类型的名称
   modelid:"",  //选择的模板的id
+  modelname:"",//模板名称
   bookinfo:{}, //保存成功的制作相册的下一步时保存的图书信息
   vgiftuserlist:[], //礼品卡使用的数量
   vgiftflag:true, // 礼品卡的入口 false-个人中心   true -- 确认支付
@@ -44,6 +45,10 @@ const mutations = {
   //选择的模板的id
   changeModelId(state, value){
     state.modelid = value;
+  },
+  //模板的name
+  changeModelName(state, value){
+    state.modelname = value;
   },
   //保存成功的制作相册的下一步时保存的图书信息
   changeObj(state,value){

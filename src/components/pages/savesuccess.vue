@@ -165,7 +165,7 @@ import { mapState, mapMutations } from "vuex";
          consoel.log(111)
        },
        ...mapMutations([
-        "changeToken","changeModelTypeId","changeModelTypeName","changeModelId","changeObj","changebookid","changeimg","changesaveflag"
+        "changeToken","changeObj","changebookid","changeimg","changesaveflag"
        ])
      },
      mounted(){

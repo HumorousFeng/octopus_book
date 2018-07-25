@@ -33,7 +33,6 @@ import { mapState, mapMutations } from "vuex";
       return{
         active:1,
         num:0, //记录点击的次数
-        photoname:"", //模板类型名称
         tabarys:[], //模板类型列表
         tabLists:[], //模板列表
         getstoken:"",
@@ -81,13 +80,11 @@ import { mapState, mapMutations } from "vuex";
           if(res.data.code ==0){
             if(res.data.data){
               this_.tabarys = res.data.data;
-              this_.active = this_.tabarys[0].id; 
               if(this_.modeltypeid){
-                this_.modelListFn(this_.modeltypeid);
+                this_.modelListFn(this_.modeltypeid, this_.modeltypename);
               }else{
-                this_.modelListFn(this_.tabarys[0].id);
-              };
-              this_.photoname = this_.tabarys[0].name;
+                this_.modelListFn(this_.tabarys[0].id, this_.tabarys[0].name);
+              }
             }
           }
         }).catch(error => {
@@ -95,20 +92,20 @@ import { mapState, mapMutations } from "vuex";
         });
       },
       //获取模板列表
-      modelListFn(typeId,paramsobj){
+      modelListFn(typeId,typeName){
         var this_ = this;
         var obj={"service":"getTemplateList","type_id":typeId};
+
+        this_.changeModelTypeId(typeId);
+        this_.changeModelTypeName(typeName);
+
         SERVERUTIL.base.baseurl(obj).then(res => {
           if(res.data.code ==0){
             if(res.data.data){
               this_.tabLists = res.data.data;
-              if(paramsobj){
-                this_.changeModelTypeId(paramsobj.obj.id);
-              }else{
-                this_.changeModelTypeId(this_.tabLists[0].type_id);
-              }
+              console.log(this_.tabLists);
               this_.changeModelId(this_.tabLists[0].id);
-              this_.changeModelTypeName(this_.tabLists[0].title);
+              this_.changeModelName(this_.tabLists[0].title);
             }
           }
         })
@@ -125,19 +122,19 @@ import { mapState, mapMutations } from "vuex";
           obj:obj,
           pindex:index
         }
-        this_.modelListFn(obj.id,paramsobj);
+        this_.modelListFn(obj.id,obj.name);
        
       },
       //跳转到详情页面
       jumptodetail(name,id){
         var this_ = this;
         this_.changeModelId(id);
-        this_.changeModelTypeName(name);
+        this_.changeModelName(name);
         this_.$router.push({  
             path: 'detail',   
             name: 'DETAIL',  
             params: {   
-              name: this_.modeltypename,   
+              name: this_.modelname,
               id: this_.modelid  
             }
         })  
@@ -145,12 +142,11 @@ import { mapState, mapMutations } from "vuex";
       //跳转到开始制作页面
       jumptomake(){
         var this_ = this;
-        //this_.changeModelTypeName(this_.photoname);
-        this_.$router.push({  
+        this_.$router.push({
           path: 'startmake',   
           name: 'STARTMAKE',  
           params: {   
-            name: this_.photoname
+            name: this_.modeltypename
           }
         }); 
       },
@@ -166,7 +162,7 @@ import { mapState, mapMutations } from "vuex";
         }) 
       },
       ...mapMutations([
-      "changeToken","changeNickname","changeModelTypeId","changeModelTypeName","changeModelId"
+      "changeToken","changeNickname","changeModelTypeId","changeModelTypeName","changeModelId","changeModelName"
     ])
       
     },
@@ -183,7 +179,7 @@ import { mapState, mapMutations } from "vuex";
       this_.changeToken(obj["stoken"]);
     },
     computed:{
-      ...mapState(['token',"vnickname","modeltypeid","modeltypename","modelid"])
+      ...mapState(['token',"vnickname","modeltypeid","modeltypename","modelid","modelname"])
     }
   }
 </script>

@@ -228,16 +228,17 @@ export default {
     jumptostartmakeFn(paramobj){
       var this_ = this;
       this_.changeModelTypeId(paramobj.type_id);
+      this_.changeModelTypeName(paramobj.type_name);
       this_.changeModelId(paramobj.template_id);
-      this_.changeModelTypeName(paramobj.book_name);
+      this_.changeModelName(paramobj.book_name);
       this_.changebookid(paramobj.id);
-      this.$router.push({  
-        path: 'startmake',   
-        name: 'STARTMAKE',  
-        params: {   
+      this.$router.push({
+        path: 'startmake',
+        name: 'STARTMAKE',
+        params: {
           name: this_.detailtitle,
           id:this_.$route.params.id
-        } 
+        }
       }) ;
     },
     //修改用户名昵称
@@ -265,7 +266,7 @@ export default {
      this.editflag =true;
     },
     ...mapMutations([
-      "changeToken","changeModelId","changeModelTypeId","changeModelTypeName","changeEnter","changeGift","changebookid",
+      "changeToken","changeModelId","changeModelName","changeModelTypeId","changeModelTypeName","changeEnter","changeGift","changebookid",
     ])
   },
   mounted() {

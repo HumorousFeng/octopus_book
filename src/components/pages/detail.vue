@@ -67,22 +67,23 @@ import { mapState, mapMutations } from "vuex";
           name: 'STARTMAKE',  
           params: {   
             name: this_.detailtitle,
-            id:this_.$route.params.id
+            id:this_.modelid
           }
         });
       },
       ...mapMutations([
-        "changeToken","changeModelTypeId","changeModelTypeName","changeModelId"
+        "changeToken","changebookid"
       ])
     },
     mounted(){
       var this_= this;
-      this_.detailtitle = this_.modeltypename;
+      this_.detailtitle = this_.modelname;
       document.title = this_.detailtitle;
       this_.modelDetailFn(this_.modelid);
+      this_.changebookid("");
     },
     computed:{
-      ...mapState(['token',"modeltypeid","modeltypename","modelid"])
+      ...mapState(['token',"modelid","modelname"])
     } 
   }
 </script>

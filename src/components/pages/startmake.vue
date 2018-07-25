@@ -113,7 +113,7 @@
              <ul class="prewimg">
                <li v-for="(item,index) in tabLists" :key="index">
                  <div @click="selectPrewImgFn(index,item)" :class="item.id==modelid?'selDiv':''">
-                   <img v-lazy="item.img" alt="1" />
+                   <img :src="item.img" :alt="index" />
                  </div>
                </li>
              </ul>
@@ -197,8 +197,8 @@ export default {
   data() {
     return {
       activeNames: '',
-      modeltypevalue:"",
-      photoName: "",
+      modeltypevalue:"",//模板类型名字
+      photoName: "",//模板名字
       tabarys: [], //模板类型列表
       liid: "1",
       userid: "", //相册模板id
@@ -272,24 +272,22 @@ export default {
         this_.$toast.loading({
           mask: false,
           message: "正在更换模板...",
-          duration:0
         });
         //如果loadflag为false，说明就没有点击上传，那就可以直接更换模板
         if(this_.loadflag){
           this_.getBookStatusFn(this_.vbookid,this_.token,index, obj); 
         }else{
           this_.changeModelId(obj.id);
-          this_.changeModelTypeName(obj.title);
+          this_.changeModelName(obj.title);
           this_.photoName = obj.title;
           this_.userid = obj.id;
           this_.modelLists.forEach(item=>{
             item.imgurl ="";
           });
           //获取新的book_id
-          this_.getbookidFn(obj.id,this_.token,obj.title,this_.vnickname);
+          // this_.getbookidFn(obj.id,this_.token,obj.title,this_.vnickname);
         }
       }
-      
      
     },
     //获取模板类型
@@ -300,7 +298,6 @@ export default {
         if (res.data.code == 0) {
           if (res.data.data) {
             this_.tabarys = res.data.data;
-            this_.modeltypevalue = this_.tabarys[0].name;
             this_.modelListFn(this_.modeltypeid);
           }
         }
@@ -316,9 +313,9 @@ export default {
       this_.$toast.loading({
         mask: false,
         message: "正在更换模板类型...",
-        duration:0
       });
       this_.changeModelTypeId(id);
+      this_.changeModelTypeName(value);
       this_.modelListFn(id);
     },
     //获取右侧不同模板类型下不同模板列表
@@ -389,16 +386,34 @@ export default {
         console.log(error);
       });
     },
-    //检查未完成的模板
-    getBookStatus(id){
-
+    //获取未完成的模板
+    getTempBookFn(modelid, token, bookname, author){
+      var this_ = this;
+      var obj = {
+        service: "getBookInfoByTemplateId",
+        id: modelid,
+        stoken: token
+      };
+      SERVERUTIL.base.baseurl(obj).then(res => {
+        if (res.data.code == 0) {
+          if (res.data.data && res.data.data.id) {
+            this_.changebookid(res.data.data.id);
+            this_.getBookDetailInfoFn(res.data.data.id,this_.token);
+            this_.getBookStatusFn(res.data.data.id,this_.token);
+          }else{
+            this_.getbookidFn(modelid, token, bookname, author)
+          }
+        }
+      }).catch(error => {
+        console.log(error);
+      });
     },
     //用户选择模板 -- 获取book_id
-    getbookidFn(id, token, bookname, author) {
+    getbookidFn(modelid, token, bookname, author) {
       var this_ = this;
       var obj = {
         service: "addBook",
-        id: id,
+        id: modelid,
         stoken: token,
         book_name: bookname,
         author: author
@@ -601,10 +616,10 @@ export default {
                 this_.photoName = objparams.title;
                 this_.userid = objparams.id;
                 this_.changeModelId(objparams.id);
-                this_.changeModelTypeName(objparams.title);
+                this_.changeModelName(objparams.title);
                 //获取新的book_id
               
-                this_.getbookidFn(objparams.id,this_.token,objparams.title,this_.vnickname);
+                // this_.getbookidFn(objparams.id,this_.token,objparams.title,this_.vnickname);
               }).catch(() => {
                   // on cancel
               });
@@ -783,7 +798,7 @@ export default {
      
     },
     ...mapMutations([ "changeToken", "changeNickname", "changeModelTypeId", "changeModelTypeName",
-      "changeModelId", "changebookid","changeimg","changefailimg","changesaveflag"
+      "changeModelId", "changeModelName", "changebookid","changeimg","changefailimg","changesaveflag"
     ])
   },
   mounted() {
@@ -795,18 +810,18 @@ export default {
         name: 'EDITIMG'
       });
     }else{
-      if(this_.modeltypename){
-        this_.photoName = this_.modeltypename;
+      if(this_.modelid){
+        this_.photoName = this_.modelname;
+        this_.modeltypevalue = this_.modeltypename;
       };
       this_.modelTypeFn();
-      this_.liid = this_.modeltypeid; 
-      if(!this_.vloadimg.length){
-        this_.getbookidFn(this_.modelid,this_.token,this_.modeltypename,this_.vnickname);              
-      };
-      
+      this_.liid = this_.modeltypeid;
+
       if(this_.vbookid){
         this_.getBookDetailInfoFn(this_.vbookid,this_.token);
         this_.getBookStatusFn(this_.vbookid,this_.token); 
+      }else{
+        this_.getTempBookFn(this_.modelid,this_.token,this_.modeltypename,this_.vnickname);
       }
       
     };
@@ -820,6 +835,7 @@ export default {
       "modeltypeid",
       "modeltypename",
       "modelid",
+      "modelname",
       "vbookid","vloadimg","vfailimgary","vsavetoeditflag"
     ])
   }
