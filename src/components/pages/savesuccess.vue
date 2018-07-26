@@ -80,11 +80,10 @@ import { mapState, mapMutations } from "vuex";
         });
         var obj={"service":"getBookDetailInfo","id":id,"stoken": token,};
         SERVERUTIL.base.baseurl(obj).then(res => {
-          if(res.data.code ==0){
+          if(res.data.code == 0){
+            this_.$toast.clear();
             if(res.data.data){
-              this_.$toast.clear();
               this_.modelLists = res.data.data;
-              
               var imgary = [];
               if(this_.modelLists.length){
                 this_.modelLists.forEach(item =>{
@@ -100,10 +99,13 @@ import { mapState, mapMutations } from "vuex";
                 });
                 this_.changeimg(imgary);
               }
-              
             }
           }
+          else {
+            this_.$toast(res.data.message);
+          }
         }).catch(error => {
+          this_.$toast(error.errMsg);
           console.log(error);
         });
       },
