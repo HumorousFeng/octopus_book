@@ -93,7 +93,7 @@ import { mapState, mapMutations } from "vuex";
                     item.liflag=true;
                     imgary.push({"imgtrueurl":item.imgtrueurl,"flag":true});
                   }else{
-                    item.imgtrueurl= item.template_img;
+                    item.imgtrueurl= item.show_img;
                     imgary.push({"imgtrueurl":item.imgtrueurl,"flag":false});
                   };
                 });
