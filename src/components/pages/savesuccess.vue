@@ -175,11 +175,10 @@ import { mapState, mapMutations } from "vuex";
       document.title = '保存成功';
       if(this_.$route.params.title){
         var title = this_.$route.params.title;
-         document.title = '预览';
+         document.title = title;
       }else{
         this_.changesaveflag(true);
       };
-      this_.ifedit = this_.$route.params.flag;
       this_.getBookDetailInfoFn(this_.token,this_.vbookid);
       this_.modelDetailFn(this_.modelid);
       

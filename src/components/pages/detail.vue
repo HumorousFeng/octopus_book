@@ -64,11 +64,7 @@ import { mapState, mapMutations } from "vuex";
         var this_ = this;
         this.$router.push({  
           path: 'startmake',   
-          name: 'STARTMAKE',  
-          params: {   
-            name: this_.detailtitle,
-            id:this_.modelid
-          }
+          name: 'STARTMAKE'
         });
       },
       ...mapMutations([

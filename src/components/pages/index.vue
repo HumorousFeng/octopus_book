@@ -131,22 +131,18 @@ import { mapState, mapMutations } from "vuex";
         this_.changeModelId(id);
         this_.changeModelName(name);
         this_.$router.push({  
-            path: 'detail',   
-            name: 'DETAIL',  
-            params: {   
-              name: this_.modelname,
-              id: this_.modelid  
-            }
+            path: '/detail',
+            name: 'DETAIL'
         })  
       },
       //跳转到开始制作页面
       jumptomake(){
         var this_ = this;
         this_.$router.push({
-          path: 'startmake',   
+          path: '/startmake',
           name: 'STARTMAKE',  
           params: {   
-            name: this_.modeltypename
+            quickmake: true
           }
         }); 
       },
@@ -155,20 +151,18 @@ import { mapState, mapMutations } from "vuex";
         var this_ = this;
         this_.$router.push({  
           path: '/personal',
-          name: 'PERSONAL', 
-          params: {   
-            token: this_.getstoken
-          }
-        }) 
+          name: 'PERSONAL'
+        })
       },
       ...mapMutations([
-      "changeToken","changeNickname","changeModelTypeId","changeModelTypeName","changeModelId","changeModelName"
+      "changeToken","changeNickname","changeModelTypeId","changeModelTypeName","changeModelId","changeModelName","changebookid"
     ])
       
     },
     mounted(){
       var this_ = this;
       document.title = '首页';
+      this_.changebookid("");
       this_.modelTypeFn();
       //this_.userLoginFn();
       if(this_.modeltypeid){

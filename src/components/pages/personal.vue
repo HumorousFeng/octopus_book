@@ -153,13 +153,15 @@ export default {
     //预览图书
     previewFn(){
       var this_ = this;
-      this_.changeModelId(this_.booklists[0].template_id);
+      this_.changeModelTypeId(this_.bookOne.type_id);
+      this_.changeModelTypeName(this_.bookOne.type_name);
+      this_.changeModelId(this_.bookOne.template_id);
+      this_.changeModelName(this_.bookOne.book_name);
       this_.changebookid(this_.bookOne.id);
       this.$router.push({  
         path: '/savesuccess',
         name: 'SAVESUCCESS',  
         params: {   
-          id:this_.bookOne.id,
           title:"预览"
         }
       }) 
@@ -178,10 +180,7 @@ export default {
       var this_ = this;
       this_.$router.push({  
         path: '/mybook',
-        name: 'MYBOOK',
-        params:{
-          booklist:this_.booklists
-        }
+        name: 'MYBOOK'
       });
     },
     //跳转到订单页面
@@ -233,12 +232,8 @@ export default {
       this_.changeModelName(paramobj.book_name);
       this_.changebookid(paramobj.id);
       this.$router.push({
-        path: 'startmake',
-        name: 'STARTMAKE',
-        params: {
-          name: this_.detailtitle,
-          id:this_.$route.params.id
-        }
+        path: '/startmake',
+        name: 'STARTMAKE'
       }) ;
     },
     //修改用户名昵称

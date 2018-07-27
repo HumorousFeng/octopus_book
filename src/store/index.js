@@ -62,8 +62,8 @@ const mutations = {
   changeGift(state,value){
     state.vgiftflag=value;
   },
-   //地址管理的入口
-   changeEnter(state,value){
+  //地址管理的入口
+  changeEnter(state,value){
     state.vaddressenterflag=value;
   },
   //收获地址

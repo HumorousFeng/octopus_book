@@ -46,7 +46,6 @@ import { mapState, mapMutations } from "vuex";
       operatebookFn(item,status){
         var this_ = this;
         var paramsobj={};
-        this_.changeModelId(item.template_id);
         paramsobj={
           "service":"setBook",
           "id":item.id,
@@ -68,28 +67,22 @@ import { mapState, mapMutations } from "vuex";
         });
       },
       //跳转到马上制作页面
-      jumptostartmakeFn(paramobj){
+      jumptostartmakeFn(obj){
         var this_ = this;
-        this_.changeModelTypeId(paramobj.type_id);
-        this_.changeModelTypeName(paramobj.type_name);
-        this_.changeModelId(paramobj.template_id);
-        this_.changeModelName(paramobj.book_name);
-        this_.changebookid(paramobj.id);
+        this_.selectBook(obj);
         this.$router.push({
-          path: 'startmake',
+          path: '/startmake',
           name: 'STARTMAKE',
         }) ;
       },
       //预览图书
       previewFn(obj){
         var this_ = this;
-        this_.changeModelId(obj.template_id);
-        this_.changebookid(obj.id);
+        this_.selectBook(obj);
         this.$router.push({  
           path: '/savesuccess',
           name: 'SAVESUCCESS',  
-          params: {   
-            id:obj.id,
+          params: {
             title:"预览"
           }
         }) 
@@ -97,11 +90,19 @@ import { mapState, mapMutations } from "vuex";
       //编辑图书 -- 跳转到保存页面，不过是可以编辑
       jumptosave(obj){
         var this_ = this;
-        this_.changebookid(obj.id);
+        this_.selectBook(obj);
         this_.$router.push({  
           path: '/editimg',
           name: 'EDITIMG' 
         });
+      },
+      selectBook(obj){
+        var this_ = this;
+        this_.changeModelTypeId(obj.type_id);
+        this_.changeModelTypeName(obj.type_name);
+        this_.changeModelId(obj.template_id);
+        this_.changeModelName(obj.book_name);
+        this_.changebookid(obj.id);
       },
       ...mapMutations([
         "changeToken","changeModelId","changeModelName","changeModelTypeId","changeModelTypeName","changeEnter","changeGift","changebookid"
@@ -111,13 +112,10 @@ import { mapState, mapMutations } from "vuex";
     mounted() {
      var this_ = this;
      document.title = "我的书架";
-    // this_.token = UTILS.SESSIONOPERATE.getStorage("stoken");
      this_.getBookListFn(this_.token);
-     //this_.booklists=this_.$route.params.booklist;
-
     } ,
     computed:{
-      ...mapState(['token',"modelid","modeltypeid","modeltypename","vaddressenterflag","vgiftflag","vbookid"])
+      ...mapState(['token'])
     }   
   }
 </script>
