@@ -88,7 +88,7 @@ import { mapState, mapMutations } from "vuex";
       //跳转到详情页
       jumptodetail(status,obj){
         var this_ = this;
-        console.log(obj)
+        this_.changeOrderId(obj.order_id);
         this.$router.push({  
           path: '/orderdetail',
           name: 'ORDERDETAIL', 
@@ -119,8 +119,8 @@ import { mapState, mapMutations } from "vuex";
           //调用wx支付
         }
       },
-       ...mapMutations([
-        "changeToken"
+      ...mapMutations([
+        "changeToken","changeOrderId"
       ])
     },
     mounted() {

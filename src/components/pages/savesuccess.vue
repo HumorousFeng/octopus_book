@@ -14,7 +14,7 @@
      <div class="btn_container" v-if="!markflag">
        <van-row>
          <van-col span="12">
-           <van-button bottom-action class="btn_share">分享</van-button>
+           <van-button bottom-action class="btn_share" @click="shareFriendFn">分享</van-button>
          </van-col>
          <van-col span="12">
             <van-button  bottom-action class="btn_make" @click="markflag=true;">制作相册</van-button>
@@ -84,20 +84,14 @@ import { mapState, mapMutations } from "vuex";
             this_.$toast.clear();
             if(res.data.data){
               this_.modelLists = res.data.data;
-              var imgary = [];
               if(this_.modelLists.length){
                 this_.modelLists.forEach(item =>{
-                  item.liflag=false;
                   if(item.result_img.length){
-                    item.imgtrueurl= item.result_img;
-                    item.liflag=true;
-                    imgary.push({"imgtrueurl":item.imgtrueurl,"flag":true});
+                    item.imgtrueurl = item.result_img;
                   }else{
-                    item.imgtrueurl= item.show_img;
-                    imgary.push({"imgtrueurl":item.imgtrueurl,"flag":false});
-                  };
+                    item.imgtrueurl = item.show_img;
+                  }
                 });
-                this_.changeimg(imgary);
               }
             }
           }
@@ -111,14 +105,14 @@ import { mapState, mapMutations } from "vuex";
       },
       //选规格
       selectTypeFn(index,obj){
-         var this_ = this;
-         this_.i = index;
-          this_.modelprice = this_.paytypelist[index].price;
-          this_.modelimg = this_.detailImg[index];
-          this_.selectItem = obj;
-          this_.selectItem.size=this_.detailinfo.size;
-          this_.selectItem.title = this_.detailinfo.title;
-          this_.selectItem.modelimg = this_.detailImg[index];
+        var this_ = this;
+        this_.i = index;
+        this_.modelprice = this_.paytypelist[index].price;
+        this_.modelimg = this_.detailImg[index];
+        this_.selectItem = obj;
+        this_.selectItem.size=this_.detailinfo.size;
+        this_.selectItem.title = this_.detailinfo.title;
+        this_.selectItem.modelimg = this_.detailImg[index];
       },
      
       //获取制作图书的规格信息 -- getTemplateInfo
@@ -149,25 +143,29 @@ import { mapState, mapMutations } from "vuex";
           console.log(error);
         });
       },
-       //点击下一步跳到付款页面
-       jumptopay(obj){
+      //点击下一步跳到付款页面
+      jumptopay(obj){
         var this_ = this;
         this_.changeObj(obj);
-        this.$router.push({  
+        this.$router.push({
           path: '/confirmpay',
-          name: 'CONFIRMPAY',  
-          params: {   
+          name: 'CONFIRMPAY',
+          params: {
             data: obj
           }
-        }); 
-       },
+        });
+      },
        //编辑图书
        editBookFn(){
          var this_ = this;
          consoel.log(111)
        },
+       shareFriendFn(){
+         var this_ = this;
+         alert('分享');
+       },
        ...mapMutations([
-        "changeToken","changeObj","changebookid","changeimg","changesaveflag"
+        "changeToken","changeObj","changesaveflag"
        ])
      },
      mounted(){
@@ -184,7 +182,7 @@ import { mapState, mapMutations } from "vuex";
       
     },
     computed:{
-      ...mapState(['token',"modeltypeid","modeltypename","modelid","bookinfo","vbookid","vloadimg","vsavetoeditflag"])
+      ...mapState(['token',"modelid","bookinfo","vbookid"])
     }       
   }
 </script>

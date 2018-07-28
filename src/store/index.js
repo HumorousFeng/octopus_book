@@ -18,11 +18,13 @@ const state = {
   vgiftflag:true, // 礼品卡的入口 false-个人中心   true -- 确认支付
   vaddressenterflag:false, //地址管理的入口 false-确认支付   true -- 个人中心
   vaddress:"",  //最后收货地址
+  payorderinfo:{},  //支付订单信息
   vbuynum:1, //购买数量
   vbookid:"", //获取book_id
   vloadimg:[],//上传的图片
   vfailimgary:[], //不合格的图片列表,
   vsavetoeditflag:false, //从保存到编辑页面
+  orderid:"", //订单id
 }
 
 const mutations = {
@@ -70,6 +72,10 @@ const mutations = {
   changeaddress(state,value){
     state.vaddress=value;
   },
+  //支付订单信息
+  changePayOrder(state,value){
+    state.payorderinfo=value;
+  },
   //购买数量
   changebuynum(state,value){
     state.vbuynum=value;
@@ -90,6 +96,10 @@ const mutations = {
   changesaveflag(state,value){
     state.vsavetoeditflag=value;
   },
+  //订单id
+  changeOrderId(state,value){
+    state.orderid=value;
+  }
 }
 
 export default new Vuex.Store({

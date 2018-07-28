@@ -69,13 +69,11 @@ import { mapState, mapMutations } from "vuex";
       return{
         modeldatas:{},
         chosenContactId: null,
-        editingContact: {},
         paymoney:0,  //合计金额
         shopnum:1, //购买数量
         giftflag:true, //是否有礼物卡
         giftnum:1,
         addressflag:true, //没有有默认收货地址
-        chosenContactId: null,
         editingContact: {},
         showList: false,
         showEdit: true,
@@ -165,6 +163,7 @@ import { mapState, mapMutations } from "vuex";
             book_id:this_.vbookid,
             num:this_.shopnum,
             address_id:this_.defaultinfo.id,
+            price_id:this_.modeldatas.id,
             card_id:cardstr
           };
           var message="";
@@ -181,37 +180,21 @@ import { mapState, mapMutations } from "vuex";
               if(res.data.code ==0){
                 if(res.data.data){
                   //调用wx支付接口
-                  this_.$router.push({  
-                    path: '/paysuccess',
-                    name: 'PAYSUCCESS',
-                  });
+                  var orderinfo = res.data.data;
+                  this_.changePayOrder(orderinfo);
+                  window.location.href = encodeURI(orderinfo.url);
+                  // this_.$router.push({
+                  //   path: '/paysuccess',
+                  //   name: 'PAYSUCCESS',
+                  // });
                 }
               }else{
                 //this_.$toast('支付失败，原因是：'+res.data.message);
                 const toast = this_.$toast({
                   forbidClick: true, // 禁用背景点击
                   loadingType: 'spinner',
-                  message: '支付失败：'+res.data.message
+                  message: '下单失败：'+res.data.message
                 });
-
-                // let second = 4;
-                // const timer = setInterval(() => {
-                //   second--;
-                //   if (second) {
-                //     toast.message = `倒计时 ${second} 秒`;
-                //   } else {
-                //     clearInterval(timer);
-                //     this_.$toast.clear();
-                //     this.$router.push({  
-                //       path: '/orderdetail',
-                //       name: 'ORDERDETAIL', 
-                //       params: {   
-                //         status: 1,
-                //         data:obj
-                //       }
-                //     }) ;
-                //   }
-                // }, 1000);
               }
             }).catch(error => {
               console.log(error);
@@ -273,8 +256,9 @@ import { mapState, mapMutations } from "vuex";
         this.chosenContactId = info.id;
       },
        ...mapMutations([
-        "changeToken","changeObj","changeGiftlist","changeEnter","changeGift","changeaddress","changebookid","changebuynum"
-      ])
+        "changeToken","changeObj","changeGiftlist","changeEnter","changeGift","changeaddress",
+         "changebookid","changebuynum","changePayOrder"
+       ])
     },
     mounted(){
       var this_= this;

@@ -99,116 +99,138 @@
 </template>
 
 <script>
+import SERVERUTIL from "../../lib/SeviceUtil";
 import UTILS from "../../lib/utils";
 import { mapState, mapMutations } from "vuex";
- export default {
-   data(){
-     return{
-       orderstatus:"", //订单状态
-       chinaStatus:"",  //订单中文
-       chinaSubStatus:"", //订单下标题 
-       orderimg:"yfk",  //订单状态图片
-       getstatus:false, //签收栏不显示
-       orderItem:{},  //订单信息数据
-       getText:"", //物流信息内容
-       operateflag:false, //操作不显示
-       dfkflag:false, //待付款的倒计时
-       paymoneytext1:"物流详情", //按钮显示内容
-       paymoneytext2:"确认收货", //按钮显示内容
-       logisticsimg:"logywc",
-       timenum:"", //倒计时
-     }
-   },
-   methods:{
-     detailFn(){
-       var this_ = this;
-       if(this_.orderstatus == 1){
-         this_.chinaStatus = '待付款';
-         this_.chinaSubStatus = this_.orderItem.wait_time;
-         if(this_.chinaSubStatus !== 0){
-            var ary=this_.chinaSubStatus.split("分");
-            var seconds = ary[1].slice(0,ary[1].length-1);
-            var num = Number(ary[0]*60)+Number(seconds);
-            var timer = setInterval(function(){
-              if(num > 1 || num == 1){
-                num -- ;
-                this_.timenum = UTILS.TIMERSET.FORMATSECONDS(num);
-                this_.chinaSubStatus = this_.timenum;
+  export default {
+    data(){
+      return{
+        orderstatus:"", //订单状态
+        chinaStatus:"",  //订单中文
+        chinaSubStatus:"", //订单下标题
+        orderimg:"yfk",  //订单状态图片
+        getstatus:false, //签收栏不显示
+        orderItem:{},  //订单信息数据
+        getText:"", //物流信息内容
+        operateflag:false, //操作不显示
+        dfkflag:false, //待付款的倒计时
+        paymoneytext1:"物流详情", //按钮显示内容
+        paymoneytext2:"确认收货", //按钮显示内容
+        logisticsimg:"logywc",
+        timenum:0, //倒计时
+        timer:null,
+      }
+    },
+    methods:{
+      getOrderInfoFn(orderid){
+        var this_ = this;
+        var obj = {
+          service:"getUserOrderInfo",
+          stoken:this_.token,
+          id:orderid
+        };
+        SERVERUTIL.base.baseurl(obj).then(res => {
+          if(res.data.code ==0) {
+            if (res.data.data) {
+              this_.orderstatus = res.data.data.status;
+              this_.orderItem = res.data.data;
+              this_.orderItem.real_price = Number(this_.orderItem.real_price).toFixed(0);
+              this_.detailFn();
+            }
+          }
+        }).catch(error => {
+          console.log(error);
+        });
+      },
+      detailFn(){
+        var this_ = this;
+        if(this_.orderstatus == 1){
+          this_.chinaStatus = '待付款';
+          this_.timenum = this_.orderItem.wait_time;
+          if(this_.timenum > 0){
+            var str = UTILS.TIMERSET.FORMATSECONDS(this_.timenum);
+            this_.chinaSubStatus = str + "后将自动取消";
+
+            this_.timer = setInterval(function(){
+              if(this_.timenum > 0){
+                this_.timenum--;
+                var str = UTILS.TIMERSET.FORMATSECONDS(this_.timenum);
+                this_.chinaSubStatus = str + "后将自动取消";
               }else{
-                clearInterval(timer);
-                this_.$router.push({  
-                  path: '/order',
-                  name: 'ORDER',
-                  params: {   
-                    id:this_.orderItem.id,
-                    token: this_.token
-                  }
-                }) ;
+                clearInterval(this_.timer);
+                this_.timer = null;
+                this_.getOrderInfoFn(this_.orderItem.order_id);
               }
             },1000);
-         };
-         this_.orderimg = 'dfk';
-         this_.paymoneytext1 ="取消订单";
-         this_.paymoneytext2 ="继续支付";
-         this_.operateflag = true;
-         this_.paymoneyflag=false;
-         this_.paymoneybtn=true;
-       }else  if(this_.orderstatus == 2){
-         this_.chinaStatus = '已取消'; 
-         this_.chinaSubStatus = "";
-         this_.orderimg = 'yqx';
-       }else  if(this_.orderstatus == 3){
-         this_.chinaStatus = '已付款，待印刷'; 
-         this_.chinaSubStatus = "照片书正在检查，等待印刷";
-         this_.orderimg = 'yfk';
-       }else  if(this_.orderstatus == 4){
-         this_.chinaStatus = '已发货';
-         this_.getstatus = true;
-         this_.chinaSubStatus = "货物已发出，请注意查收";
-         this_.orderimg = 'yfh';
-         this_.getText = "申通物流已揽收";
-         this_.operateflag = true;
-         this_.paymoneytext1 ="物流详情";
-         this_.paymoneytext2 ="确认收货";
-         this_.paymoneybtn=true; 
-         this_.paymoneytext=true;
-       }else  if(this_.orderstatus == 5){
-         this_.chinaStatus = '已签收';
-         this_.getstatus = true;
-         this_.chinaSubStatus = ""; 
-         this_.orderimg = 'yqs';
-         this_.getText = "您已签收本次订单包裹，本次配送完成";
-         this_.operateflag = true;
-         this_.paymoneytext1 ="物流详情";
-         this_.paymoneytext2 ="确认收货";
-       }else{
-         this_.chinaStatus = '已完成'; 
-         this_.operateflag = false;
-         this_.getstatus = true;
-         this_.chinaSubStatus = "";
-         this_.orderimg = 'ywc';
-         this_.getText = "您已签收本次订单包裹，本次配送完成";
-       };
-     },
-     ...mapMutations([
-       "changeToken"
-     ])
-   },
-   mounted() {
+          };
+          this_.orderimg = 'dfk';
+          this_.paymoneytext1 ="取消订单";
+          this_.paymoneytext2 ="继续支付";
+          this_.operateflag = true;
+        }else if(this_.orderstatus == 2){
+          this_.chinaStatus = '已取消';
+          this_.chinaSubStatus = "";
+          this_.orderimg = 'yqx';
+          this_.getstatus = false;
+          this_.operateflag = false;
+          this_.dfkflag = false
+        }else if(this_.orderstatus == 3){
+          this_.chinaStatus = '已付款，待印刷';
+          this_.chinaSubStatus = "照片书正在检查，等待印刷";
+          this_.orderimg = 'yfk';
+        }else if(this_.orderstatus == 4){
+          this_.chinaStatus = '已发货';
+          this_.getstatus = true;
+          this_.chinaSubStatus = "货物已发出，请注意查收";
+          this_.orderimg = 'yfh';
+          this_.getText = "申通物流已揽收";
+          this_.operateflag = true;
+          this_.paymoneytext1 ="物流详情";
+          this_.paymoneytext2 ="确认收货";
+        }else if(this_.orderstatus == 5){
+          this_.chinaStatus = '已签收';
+          this_.getstatus = true;
+          this_.chinaSubStatus = "";
+          this_.orderimg = 'yqs';
+          this_.getText = "您已签收本次订单包裹，本次配送完成";
+          this_.operateflag = true;
+          this_.paymoneytext1 ="物流详情";
+          this_.paymoneytext2 ="确认收货";
+        }else{
+          this_.chinaStatus = '已完成';
+          this_.operateflag = false;
+          this_.getstatus = true;
+          this_.chinaSubStatus = "";
+          this_.orderimg = 'ywc';
+          this_.getText = "您已签收本次订单包裹，本次配送完成";
+        };
+      },
+      ...mapMutations([
+        "changeToken","changeOrderId"
+      ])
+    },
+    mounted() {
       var this_ = this;
-     
-      this_.orderstatus = this_.$route.params.status;
-      this_.orderItem = this_.$route.params.data;
-       console.log(this_.orderItem)
-      this_.orderItem.real_price = Number(this_.orderItem.real_price).toFixed(0);
-      this_.orderItem.name="张三";
       document.title = "订单详情";
-      this_.detailFn();
-    }, 
+      this_.orderstatus = this_.$route.params.status;
+      if(this_.$route.params.data){
+        this_.orderItem = this_.$route.params.data;
+        this_.orderItem.real_price = Number(this_.orderItem.real_price).toFixed(0);
+        this_.detailFn();
+      }else{
+        this_.getOrderInfoFn(this_.orderid);
+      }
+    },
+    beforeDestroy() {
+      var this_ = this;
+      if(this_.timer) {
+        clearInterval(this_.timer); //关闭
+      }
+    },
     computed:{
-      ...mapState(['token'])
-    } ,      
- }
+      ...mapState(['token','orderid'])
+    },
+  }
 </script>
 
 <style scoped lang="scss" type="text/css">
