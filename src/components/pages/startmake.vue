@@ -798,33 +798,33 @@ body {
         li {
           width: 100%;
           height: 100%;
-          margin-bottom: 0.3rem;
+          margin-bottom: 10px;
           display: flex;
           flex-direction: column;
           div,
           .selDiv {
             margin: 0 auto;
-            width: 1.6rem;
-            height: 2.2rem;
+            max-width: 1.6rem;
+            max-height: 2.2rem;
             // background: url(../../images/rightbg.png) no-repeat;
             background-size: contain;
             padding: 5px;
             box-sizing: border-box;
-            display: flex;
+            // display: flex;
             justify-content: center;
             align-content: center;
             img {
-              width: 90%;
-              height: 90%;
+              max-width: 90%;
+              max-height: 90%;
               box-shadow: 0 2px 5px 1px #E8B5C5;
             }
           }
-          .selDiv {
-            width: 1.78rem;
-            height: 2.38rem;
-            // background: url(../../images/rightselectbg.png) no-repeat;
-            background-size: contain;
-          }
+          // .selDiv {
+          //   width: 1.78rem;
+          //   height: 2.38rem;
+          //   // background: url(../../images/rightselectbg.png) no-repeat;
+          //   background-size: contain;
+          // }
         }
       }
     }
