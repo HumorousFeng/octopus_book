@@ -317,7 +317,7 @@ export default {
           if (res.data.data && res.data.data.id) {
             if(tips){
               this_.$dialog.confirm({
-                message: '当前模板有未完成的图书，请确认是编辑未完成的图书还是制作新的图书？',
+                message: '你所选择的模板还有未完成的图书，请选择编辑未完成的图书还是制作新的图书？',
                 confirmButtonText: '编辑图书',
                 cancelButtonText: '制作图书'
               }).then(() => {
