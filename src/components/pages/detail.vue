@@ -63,7 +63,7 @@ import { mapState, mapMutations } from "vuex";
       jumptostartmakeFn(){
         var this_ = this;
         this.$router.push({  
-          path: 'startmake',   
+          path: '/startmake',
           name: 'STARTMAKE'
         });
       },
@@ -76,7 +76,9 @@ import { mapState, mapMutations } from "vuex";
       this_.detailtitle = this_.modelname;
       document.title = this_.detailtitle;
       this_.modelDetailFn(this_.modelid);
-      this_.changebookid("");
+      if(!this_.$route.params.bookid){
+        this_.changebookid("");
+      }
     },
     computed:{
       ...mapState(['token',"modelid","modelname"])

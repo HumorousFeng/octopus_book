@@ -325,14 +325,17 @@ export default {
                 this_.getBookDetailInfoFn(res.data.data.id,this_.token);
                 this_.getBookStatusFn(res.data.data.id,this_.token);
               }).catch(() => {
-                  // on cancel
-                  this_.getbookidFn(modelid, token, this_.modelname,this_.vnickname)
+                // on cancel 制作新的图书
+                this_.getbookidFn(modelid, token, this_.modelname,this_.vnickname)
               }); 
-            }
-            else {
-              this_.getbookidFn(modelid, token, this_.modelname,this_.vnickname)
+            }else{
+              // 默认查找之前未完成的图书
+              this_.changebookid(res.data.data.id);
+              this_.getBookDetailInfoFn(res.data.data.id,this_.token);
+              this_.getBookStatusFn(res.data.data.id,this_.token);
             }
           }else{
+            //没有未完成，直接新增图书
             this_.getbookidFn(modelid, token, this_.modelname,this_.vnickname)
           }
         }
@@ -559,7 +562,10 @@ export default {
       var this_ = this;
       this_.$router.push({
         path: "/detail",
-        name: "DETAIL"
+        name: "DETAIL",
+        params: {
+          bookid: this_.vbookid
+        }
       });
     },
     //保存至书架

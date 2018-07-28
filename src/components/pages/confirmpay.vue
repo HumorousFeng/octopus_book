@@ -183,6 +183,7 @@ import { mapState, mapMutations } from "vuex";
                   var orderinfo = res.data.data;
                   this_.changePayOrder(orderinfo);
                   window.location.href = encodeURI(orderinfo.url);
+                  
                   // this_.$router.push({
                   //   path: '/paysuccess',
                   //   name: 'PAYSUCCESS',
