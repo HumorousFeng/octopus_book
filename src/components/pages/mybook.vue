@@ -129,11 +129,16 @@ import { mapState, mapMutations } from "vuex";
       border-bottom:1px solid #ccc;
       padding-bottom:0.3rem;
       box-sizing: border-box; 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+   
       .title_left{
         position: relative;
+    
         img{
-          width:100%;
-          height: 4rem;
+          max-width:100%;
+          max-height: 4rem;
         }
         i{
           position: absolute;
@@ -150,12 +155,12 @@ import { mapState, mapMutations } from "vuex";
         }
       }
       .content-right{
+        margin-left: 10px;
         .opearte_container{
           display:flex;
           flex-direction: row;
           flex-grow: 3;
           width: 100%;
-          padding: 25% 0.2rem 0;
           box-sizing: border-box;
           span{
             width: 1.22rem;
