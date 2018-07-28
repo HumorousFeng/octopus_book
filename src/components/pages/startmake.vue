@@ -645,6 +645,10 @@ export default {
           mask: false,
           message: "正在提交模板...",
         });
+        setTimeout(() => {
+          this.previewFn();
+        }, 2000)
+        
       }
     },
     ...mapMutations([ "changeToken", "changeNickname", "changeModelTypeId", "changeModelTypeName",
