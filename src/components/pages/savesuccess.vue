@@ -199,6 +199,7 @@ import { mapState, mapMutations } from "vuex";
       img{
         width: 5.94rem;
         height: 8.20rem;
+        box-shadow: 0 2px 10px 1px #E8B5C5;
       }
       .load_img{
         width: 3.94rem;

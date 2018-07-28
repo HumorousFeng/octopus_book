@@ -365,6 +365,7 @@ export default {
     margin-top: 0.4rem;
     padding: 0 0.3rem 0 0.5rem;
     box-sizing: border-box;
+    
     h4{
       margin-bottom:0.3rem;
       font-size:0.3rem;
@@ -381,19 +382,25 @@ export default {
         }
       }
     }
+    .edit_item {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 0;
+    }
     .title_left{
       img{
-        width:100%;
-        height: 30vh;
+        max-width:100%;
+        max-height: 30vh;
       }
     }
     .content-right,.nobook_container{
+      margin-left: 10px;
       .opearte_container{
         display:flex;
         flex-direction: row;
         flex-grow: 3;
         width: 100%;
-        padding: 25% 0.2rem 0;
         box-sizing: border-box;
         span{
           width: 1.22rem;
@@ -437,8 +444,6 @@ export default {
         margin-top: 0.6rem;
       }
     }
-    
-
   }
   .footer{
     position: fixed;
