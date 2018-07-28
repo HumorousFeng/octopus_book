@@ -316,14 +316,22 @@ export default {
         if (res.data.code == 0) {
           if (res.data.data && res.data.data.id) {
             if(tips){
-              this_.$toast.loading({
-                mask: true,
-                message: "继续制作未完成的图书",
-              });
+              this_.$dialog.confirm({
+                message: '当前模板有未完成的图书，请确认是编辑未完成的图书还是制作新的图书？',
+                confirmButtonText: '编辑图书',
+                cancelButtonText: '制作图书'
+              }).then(() => {
+                this_.changebookid(res.data.data.id);
+                this_.getBookDetailInfoFn(res.data.data.id,this_.token);
+                this_.getBookStatusFn(res.data.data.id,this_.token);
+              }).catch(() => {
+                  // on cancel
+                  this_.getbookidFn(modelid, token, this_.modelname,this_.vnickname)
+              }); 
             }
-            this_.changebookid(res.data.data.id);
-            this_.getBookDetailInfoFn(res.data.data.id,this_.token);
-            this_.getBookStatusFn(res.data.data.id,this_.token);
+            else {
+              this_.getbookidFn(modelid, token, this_.modelname,this_.vnickname)
+            }
           }else{
             this_.getbookidFn(modelid, token, this_.modelname,this_.vnickname)
           }
