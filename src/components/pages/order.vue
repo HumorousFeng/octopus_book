@@ -147,7 +147,7 @@ import { mapState, mapMutations } from "vuex";
       //继续支付和物流详情操作
       operatebtnFn(flag,obj){
         var this_ = this;
-        //flag -true 物流详情   
+        //flag -true 物流详情
         //flag -false  继续支付
         if(flag){
           this.$router.push({  
@@ -159,6 +159,28 @@ import { mapState, mapMutations } from "vuex";
           }) ;
         }else{
           //调用wx支付
+          var paramsobj = {
+            service: "payOrder",
+            stoken: this_.token,
+            id: obj.order_id
+          };
+          SERVERUTIL.base.baseurl(paramsobj).then(res => {
+            if(res.data.code ==0){
+              if(res.data.data){
+                //调用wx支付接口
+                var url = res.data.data;
+                window.location.href = encodeURI(url);
+              }
+            }else{
+              const toast = this_.$toast({
+                forbidClick: true, // 禁用背景点击
+                loadingType: 'spinner',
+                message: '下单失败：'+res.data.message
+              });
+            }
+          }).catch(error => {
+            console.log(error);
+          });
         }
       },
       touchStart(ev){

@@ -181,7 +181,6 @@ import { mapState, mapMutations } from "vuex";
                 if(res.data.data){
                   //调用wx支付接口
                   var orderinfo = res.data.data;
-                  this_.changePayOrder(orderinfo);
                   window.location.href = encodeURI(orderinfo.url);
                   
                   // this_.$router.push({
@@ -258,7 +257,7 @@ import { mapState, mapMutations } from "vuex";
       },
        ...mapMutations([
         "changeToken","changeObj","changeGiftlist","changeEnter","changeGift","changeaddress",
-         "changebookid","changebuynum","changePayOrder"
+         "changebookid","changebuynum"
        ])
     },
     mounted(){

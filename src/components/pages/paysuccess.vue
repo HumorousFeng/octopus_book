@@ -18,7 +18,7 @@ import { mapState, mapMutations } from "vuex";
         var str=window.location.href;
         var obj = UTILS.PARAMSREG.paramsregurl(str);
         console.log(obj);
-        this_.changeOrderId(obj['order_id']);
+        this_.changeOrderId(obj['orderid']);
         var token = localStorage.getItem('token');
         this_.changeToken(token);
         console.log('token'+token);

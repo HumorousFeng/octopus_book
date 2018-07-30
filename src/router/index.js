@@ -95,6 +95,14 @@ export default new Router({
       }
     },
     {
+      path: '/payfail',
+      name: 'PAYFAIL',
+      component: resolve => require(['@/components/pages/payfail'],resolve),
+      meta: {
+        title: '支付失败'
+      }
+    },
+    {
       path: '/giftzero',
       name: 'GIFTZERO',
       component: resolve => require(['@/components/pages/giftzero'],resolve),

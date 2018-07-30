@@ -45,7 +45,7 @@
     <!-- 商品信息栏 -->
     <div class="order_container">
         <div class="order_title">
-          <span>订单号：<i v-text="orderItem.book_id"></i></span> 
+          <span>订单号：<i v-text="orderItem.order_id"></i></span>
         </div>
         <div class="order_content">
            <van-card class="card_content" :title="orderItem.template_name" :desc="orderItem.discount_price" :num="orderItem.num" :price="orderItem.unit_price" :thumb="orderItem.img"/> 
@@ -69,7 +69,7 @@
     <!-- 订单时间信息栏 -->
     <div class="orderTime_container">
       <div>
-        <span class="fr"><i v-text="orderItem.book_id"></i></span>
+        <span class="fr"><i v-text="orderItem.order_id"></i></span>
         <span class="">订单号</span>
       </div>
       <div>
@@ -84,12 +84,14 @@
     <!-- 操作栏 -->
     <div class="operate_container" v-if="operateflag">
       <van-row>
-        <van-col span="12" class="time_left" v-if="dfkflag">111</van-col>
+        <van-col span="12" class="time_left" v-if="timenum>0">
+          <span v-text="waitTimeStr"></span>
+        </van-col>
         <van-col span="12" class="btn_right">
-          <div class="order_btn">
+          <div class="order_btn" @click="onClickLeft">
             <div class="tc fr" v-text="paymoneytext1"></div>
           </div>
-          <div class="order_btn">
+          <div class="order_btn" @click="onClickRight">
             <div class="tc fr" v-text="paymoneytext2"></div>
           </div>
         </van-col>
@@ -113,9 +115,9 @@ import { mapState, mapMutations } from "vuex";
         orderItem:{},  //订单信息数据
         getText:"", //物流信息内容
         operateflag:false, //操作不显示
-        dfkflag:false, //待付款的倒计时
-        paymoneytext1:"物流详情", //按钮显示内容
-        paymoneytext2:"确认收货", //按钮显示内容
+        waitTimeStr:"", //待付款的倒计时
+        paymoneytext1:"", //按钮显示内容
+        paymoneytext2:"", //按钮显示内容
         logisticsimg:"logywc",
         timenum:0, //倒计时
         timer:null,
@@ -150,12 +152,14 @@ import { mapState, mapMutations } from "vuex";
           if(this_.timenum > 0){
             var str = UTILS.TIMERSET.FORMATSECONDS(this_.timenum);
             this_.chinaSubStatus = str + "后将自动取消";
+            this_.waitTimeStr = UTILS.TIMERSET.FORMATTIME(this_.timenum);
 
             this_.timer = setInterval(function(){
               if(this_.timenum > 0){
                 this_.timenum--;
                 var str = UTILS.TIMERSET.FORMATSECONDS(this_.timenum);
                 this_.chinaSubStatus = str + "后将自动取消";
+                this_.waitTimeStr = UTILS.TIMERSET.FORMATTIME(this_.timenum);
               }else{
                 clearInterval(this_.timer);
                 this_.timer = null;
@@ -170,18 +174,22 @@ import { mapState, mapMutations } from "vuex";
         }else if(this_.orderstatus == 2){
           this_.chinaStatus = '已取消';
           this_.chinaSubStatus = "";
+          this_.waitTimeStr = "";
           this_.orderimg = 'yqx';
           this_.getstatus = false;
           this_.operateflag = false;
-          this_.dfkflag = false
         }else if(this_.orderstatus == 3){
           this_.chinaStatus = '已付款，待印刷';
           this_.chinaSubStatus = "照片书正在检查，等待印刷";
+          this_.waitTimeStr = "";
           this_.orderimg = 'yfk';
+          this_.getstatus = false;
+          this_.operateflag = false;
         }else if(this_.orderstatus == 4){
           this_.chinaStatus = '已发货';
           this_.getstatus = true;
           this_.chinaSubStatus = "货物已发出，请注意查收";
+          this_.waitTimeStr = "";
           this_.orderimg = 'yfh';
           this_.getText = "申通物流已揽收";
           this_.operateflag = true;
@@ -191,6 +199,7 @@ import { mapState, mapMutations } from "vuex";
           this_.chinaStatus = '已签收';
           this_.getstatus = true;
           this_.chinaSubStatus = "";
+          this_.waitTimeStr = "";
           this_.orderimg = 'yqs';
           this_.getText = "您已签收本次订单包裹，本次配送完成";
           this_.operateflag = true;
@@ -201,12 +210,72 @@ import { mapState, mapMutations } from "vuex";
           this_.operateflag = false;
           this_.getstatus = true;
           this_.chinaSubStatus = "";
+          this_.waitTimeStr = "";
           this_.orderimg = 'ywc';
           this_.getText = "您已签收本次订单包裹，本次配送完成";
         };
       },
+      onClickLeft(){
+        var this_ = this;
+        if(this_.orderstatus == 1){
+          this_.$dialog.confirm({
+            title: '',
+            message: '确定要取消此订单吗？'
+          }).then(() => {
+            var paramsobj = {
+              service: "setOrder",
+              stoken: this_.token,
+              id: this_.orderItem.order_id,
+              status: 2
+            };
+            SERVERUTIL.base.baseurl(paramsobj).then(res => {
+              if (res.data.code == 0) {
+                clearInterval(this_.timer);
+                this_.timer = null;
+                this_.getOrderInfoFn(this_.orderItem.order_id);
+              }
+            }).catch(error => {
+              console.log(error);
+            });
+          }).catch(() => {
+
+          });
+        }else if(this_.orderstatus == 4 || this_.orderstatus == 5){
+          alert('物流详情');
+        }
+      },
+      onClickRight(){
+        var this_ = this;
+        if(this_.orderstatus == 1){
+          //调用wx支付
+          var paramsobj = {
+            service: "payOrder",
+            stoken: this_.token,
+            id: this_.orderItem.order_id
+          };
+          SERVERUTIL.base.baseurl(paramsobj).then(res => {
+            if(res.data.code ==0){
+              if(res.data.data){
+                //调用wx支付接口
+                var url = res.data.data;
+                window.location.href = encodeURI(url);
+              }
+            }else{
+              const toast = this_.$toast({
+                forbidClick: true, // 禁用背景点击
+                loadingType: 'spinner',
+                message: '下单失败：'+res.data.message
+              });
+            }
+          }).catch(error => {
+            console.log(error);
+          });
+        }else if(this_.orderstatus == 4 || this_.orderstatus == 5){
+          alert('确定收货');
+        }
+      },
       ...mapMutations([
-        "changeToken","changeOrderId"
+        "changeToken"
       ])
     },
     mounted() {
@@ -398,6 +467,13 @@ import { mapState, mapMutations } from "vuex";
     margin-top: 0.2rem;
   }
   .operate_container{
+    .time_left{
+      color:#F44;
+      padding:0.25rem;
+      span{
+        font-size: 16px;
+      }
+    }
     .btn_right{
       float: right;
       display: flex;

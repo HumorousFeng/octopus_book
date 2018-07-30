@@ -18,7 +18,6 @@ const state = {
   vgiftflag:true, // 礼品卡的入口 false-个人中心   true -- 确认支付
   vaddressenterflag:false, //地址管理的入口 false-确认支付   true -- 个人中心
   vaddress:"",  //最后收货地址
-  payorderinfo:{},  //支付订单信息
   vbuynum:1, //购买数量
   vbookid:"", //获取book_id
   vloadimg:[],//上传的图片
@@ -71,10 +70,6 @@ const mutations = {
   //收获地址
   changeaddress(state,value){
     state.vaddress=value;
-  },
-  //支付订单信息
-  changePayOrder(state,value){
-    state.payorderinfo=value;
   },
   //购买数量
   changebuynum(state,value){
