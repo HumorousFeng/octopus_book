@@ -179,6 +179,7 @@ import { mapState, mapMutations } from "vuex";
             SERVERUTIL.base.baseurl(obj).then(res => {
               if(res.data.code ==0){
                 if(res.data.data){
+                  localStorage.setItem('token', this_.token);
                   //调用wx支付接口
                   var orderinfo = res.data.data;
                   window.location.href = encodeURI(orderinfo.url);
