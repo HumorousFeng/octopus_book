@@ -13,7 +13,7 @@ import { mapState, mapMutations } from "vuex";
   export default {
     data(){
       return{
-        addressflag:true, //编辑地址
+        firstflag:true, //第一个地址 设为默认地址
         areaList:{},
         checked:true,
         nameerrmessage:"", //名字错误提示
@@ -73,6 +73,7 @@ import { mapState, mapMutations } from "vuex";
           obj.id = this_.addressIinfo.id;
           obj.service = "setAddress";
         }else{
+          obj.default_status = this_.firstflag ? 1 : status;
           obj.service ="addAddress";
         }
         SERVERUTIL.base.baseurl(obj).then(res => {
@@ -102,7 +103,7 @@ import { mapState, mapMutations } from "vuex";
             "district":res.province+"-"+res.city+"-"+ res.county,
             "address":res.address_detail,
             "district_id":res.area_code,
-            "default_status":status,
+            "default_status":res.status,
             "status":10
           };
         SERVERUTIL.base.baseurl(paramsobj).then(res => {
@@ -123,7 +124,7 @@ import { mapState, mapMutations } from "vuex";
     mounted() {
       var this_ = this;
       document.title = "编辑收货地址";
-      this_.addressflag = this_.$route.params.flag;
+      this_.firstflag = this_.$route.params.flag;
       this_.areaList = AREALIST.areaList;
       if(this_.$route.params.data){
         this_.userid = this_.$route.params.data.id;

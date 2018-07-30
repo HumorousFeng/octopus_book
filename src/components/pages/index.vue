@@ -103,7 +103,6 @@ import { mapState, mapMutations } from "vuex";
           if(res.data.code ==0){
             if(res.data.data){
               this_.tabLists = res.data.data;
-              console.log(this_.tabLists);
               this_.changeModelId(this_.tabLists[0].id);
               this_.changeModelName(this_.tabLists[0].title);
             }
@@ -171,6 +170,7 @@ import { mapState, mapMutations } from "vuex";
       var str=window.location.href;
       var obj = UTILS.PARAMSREG.paramsregurl(str);
       this_.changeToken(obj["stoken"]);
+      localStorage.setItem('token', obj['stoken']);
     },
     computed:{
       ...mapState(['token',"vnickname","modeltypeid","modeltypename","modelid","modelname"])

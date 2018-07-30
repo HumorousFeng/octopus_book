@@ -5,7 +5,7 @@
           <img src="../../images/addressbg.png" alt=".">
         </div>
         <p class="tc">收货地址为空</p>  
-        <div class="add_address tc"  @click="addAddressFn(false)">添加收货地址 </div>
+        <div class="add_address tc"  @click="addAddressFn($event,true)">添加收货地址 </div>
      </div>
      <div  class="has_add" v-else>
        <ul class="address_manager">
@@ -31,7 +31,7 @@
              </div>
           </li>
        </ul> 
-       <div class="add_address tc"  @click.stop="addAddressFn($event,true)">添加新地址 </div>  
+       <div class="add_address tc"  @click.stop="addAddressFn($event,false)">添加新地址 </div>
      </div>
   </div>
 </template>
@@ -160,16 +160,16 @@ import { mapState, mapMutations } from "vuex";
        }).then(() => {
          var paramsobj={};
          paramsobj={
-          "service":"setAddress",
-          "id":obj.id,
-          "stoken":this_.token,
-          "link_name":obj.link_name,
-          "link_tel":obj.tel,
-          "district":obj.province+"-"+obj.city+"-"+ obj.county,
-          "address":obj.address_detail,
-          "district_id":obj.area_code,
-          "status":10
-        };
+            "service":"setAddress",
+            "id":obj.id,
+            "stoken":this_.token,
+            "link_name":obj.link_name,
+            "link_tel":obj.tel,
+            "district":obj.province+"-"+obj.city+"-"+ obj.county,
+            "address":obj.address_detail,
+            "district_id":obj.area_code,
+            "status":10
+          };
           SERVERUTIL.base.baseurl(paramsobj).then(res => {
             if(res.data.code == 0){
               this_.getAddressListFn(this_.token);
