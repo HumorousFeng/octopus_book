@@ -100,7 +100,7 @@ export default {
   data() {
     return {
       active: 0,
-      message:"卡密码错误",
+      message:"",
       ifgiftflag: false, //是否有礼品卡
       showgift: false, //是否显示绑定礼品卡弹框
       showgiftinfo: false, //是否显示使用说明弹框
@@ -116,6 +116,13 @@ export default {
       Vnum:0, //可用卡数量
       vailableList:[],  //可用礼品卡
     };
+  },
+  watch: {
+   giftpassword: function (newVal, oldVal) {
+     if (newVal !== oldVal) {
+       this.message = '';
+     }
+   }
   },
   methods: {
     //tab切换
@@ -204,10 +211,12 @@ export default {
           this_.getUserCardFn(this_.token);
           this_.showgift = false;
         }else{
-          this.errorflag = true;
+          this_.errorflag = true;
+          this_.message = res.data.message;
         }
       }).catch(error => {
-        console.log(error);
+        this_.errorflag = true;
+        this_.message = error.errMsg;
       });
     },
 

@@ -313,6 +313,9 @@ export default {
       color: #fff;
       font-size: 0.28rem;
       padding-top: 0.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       span {
         display: inline-block;
         vertical-align: top;
@@ -350,16 +353,7 @@ export default {
       justify-content:center;
       img{
         margin: 0 auto 0.1rem;;
-        width: 0.48rem;
         height: 0.48rem;
-        
-      }
-      .address_icon{
-        width: 0.39rem;
-      }
-      .gift_icon{
-        width: 0.48rem;
-        height: 0.39rem;
       }
     }
       p{
