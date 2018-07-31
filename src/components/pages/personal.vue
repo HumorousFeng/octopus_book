@@ -313,6 +313,9 @@ export default {
       color: #fff;
       font-size: 0.28rem;
       padding-top: 0.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       span {
         display: inline-block;
         vertical-align: top;
