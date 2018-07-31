@@ -100,7 +100,6 @@ export default {
   data() {
     return {
       active: 0,
-      activeicon: 0,
       message:"卡密码错误",
       ifgiftflag: false, //是否有礼品卡
       showgift: false, //是否显示绑定礼品卡弹框
@@ -116,7 +115,6 @@ export default {
       notVnum:0, //不可用卡的数量
       Vnum:0, //可用卡数量
       vailableList:[],  //可用礼品卡
-      tipbindgiftflag:false //绑定礼品卡的小提示连接
     };
   },
   methods: {
@@ -126,13 +124,14 @@ export default {
       this_.active = index;
     },
     //获取可用礼品卡的数据
-    getUserCardFn(token,status){
+    getUserCardFn(token){
       var this_ = this;
-      var obj={"service":"getUserCard","stoken":token,"status":status};
+      var obj={"service":"getUserCard","stoken":token};
       SERVERUTIL.base.baseurl(obj).then(res => {
         if(res.data.code ==0){
           if(res.data.data){
-            this_.giftcardnum = res.data.data.length;
+            this_.vailableList.splice(0, this_.vailableList.length);
+            this_.notAvailableList.splice(0, this_.notAvailableList.length);
             var giftary = res.data.data;
             giftary.forEach(item =>{
               item.left_price = Number(item.left_price).toFixed(0);
@@ -202,7 +201,7 @@ export default {
       };
       SERVERUTIL.base.baseurl(obj).then(res => {
         if(res.data.code == 0){
-          this_.getUserCardFn(this_.token,"");
+          this_.getUserCardFn(this_.token);
           this_.showgift = false;
         }else{
           this.errorflag = true;
@@ -227,7 +226,7 @@ export default {
     var this_ = this;
     this_.ifgiftflag = this_.$route.params.flag;
     document.title = "我的礼品卡";
-    this_.getUserCardFn(this_.token,"");
+    this_.getUserCardFn(this_.token);
   },
   computed:{
     word_use(){

@@ -133,21 +133,27 @@ export default {
     operatebookFn(status){
       var this_ = this;
       var status = status || "";
-      var paramsobj={};
-      paramsobj={
-        "service":"setBook",
-        "id":this_.booklists[0].id,
-        "stoken":this_.token,
-        "book_name":this_.booklists[0].book_name,
-        "author":this_.booklists[0].author,
-        "status":status
-      };
-      SERVERUTIL.base.baseurl(paramsobj).then(res => {
-        if(res.data.code == 0){
-          this_.getBookListFn(this_.token);
-        }
-      }).catch(error => {
-        console.log(error);
+      this_.$dialog.confirm({
+        title: '',
+        message: '确定要删除此相册吗？'
+      }).then(() => {
+        var paramsobj={
+          service: "setBook",
+          id: this_.booklists[0].id,
+          stoken: this_.token,
+          book_name: this_.booklists[0].book_name,
+          author: this_.booklists[0].author,
+          status: status
+        };
+        SERVERUTIL.base.baseurl(paramsobj).then(res => {
+          if(res.data.code == 0){
+            this_.getBookListFn(this_.token);
+          }
+        }).catch(error => {
+          console.log(error);
+        });
+      }).catch(() => {
+
       });
     },
     //预览图书
