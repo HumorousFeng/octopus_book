@@ -45,25 +45,31 @@ import { mapState, mapMutations } from "vuex";
       //删除图书信息
       operatebookFn(item,status){
         var this_ = this;
-        var paramsobj={};
-        paramsobj={
-          "service":"setBook",
-          "id":item.id,
-          "stoken":this_.token,
-          "book_name":item.book_name,
-          "author":item.author,
-          "status":status
-        };
-        SERVERUTIL.base.baseurl(paramsobj).then(res => {
-          if(res.data.code == 0){
-            this_.$toast({
-              mask: false,
-              message: "删除成功"  
-            });
-            this_.getBookListFn(this_.token);
-          }
-        }).catch(error => {
-          console.log(error);
+        this_.$dialog.confirm({
+          title: '',
+          message: '确定要删除此相册吗？'
+        }).then(() => {
+          var paramsobj={
+            service: "setBook",
+            id: item.id,
+            stoken: this_.token,
+            book_name: item.book_name,
+            author: item.author,
+            status: status
+          };
+          SERVERUTIL.base.baseurl(paramsobj).then(res => {
+            if(res.data.code == 0){
+              this_.$toast({
+                mask: false,
+                message: "删除成功"
+              });
+              this_.getBookListFn(this_.token);
+            }
+          }).catch(error => {
+            console.log(error);
+          });
+        }).catch(() => {
+
         });
       },
       //跳转到马上制作页面
