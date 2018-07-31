@@ -8,7 +8,7 @@
    <div v-if="addressflag" class="user_address">
      <ul @click="jumpaddress">
        <li><span class="d-i-b mr10" v-text="defaultinfo.link_name"></span><span v-text="defaultinfo.link_tel"></span></li>
-       <li class="ad"><span v-text="defaultinfo.district+defaultinfo.address"></span><img src="../../images/rightjt.png" alt="无"></li>
+       <li class="ad"><span v-text="defaultinfo.district+' '+defaultinfo.address"></span><img src="../../images/rightjt.png" alt="无"></li>
      </ul>
     
      <div class="clear"></div>

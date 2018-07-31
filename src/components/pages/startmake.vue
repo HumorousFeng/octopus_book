@@ -218,6 +218,7 @@ export default {
       canusenum:0, //从制作成功返回的可用的图片张数
       totalnum:0, //获取当前模板可以上传的最大图片数
       finishnum:0, //获取当前模板已经上传成功的图片数量
+      checktimer:null
 
     };
   },
@@ -260,7 +261,7 @@ export default {
           duration:1000
         });
       }else{
-        this_.getBookStatusFn(this_.vbookid, this_.token, obj);
+        this_.getBookStatusFn(this_.vbookid, this_.token, false, obj);
       }
     },
     //获取模板类型
@@ -410,7 +411,7 @@ export default {
               setTimeout(function(){
                 this_.$toast.clear();
                 this_.getBookDetailInfoFn(this_.vbookid, this_.token);
-                this_.getBookStatusFn(this_.vbookid, this_.token);
+                this_.getBookStatusFn(this_.vbookid, this_.token, true);
               },count*1000);
             }
           }else{
@@ -493,7 +494,7 @@ export default {
       });
     },
     //查看图片的上传请况
-    getBookStatusFn(id, token, objparams) {
+    getBookStatusFn(id, token, isupload, objparams) {
       var this_ = this;
       var obj = { service: "getBookStatus", id: id, stoken: token };
       SERVERUTIL.base.baseurl(obj).then(res => {
@@ -530,7 +531,7 @@ export default {
               }).catch(() => {
                   // on cancel
               });
-            }else{
+            }else if(isupload){
               this_.checkFinish(1)
             }
           }
@@ -541,7 +542,14 @@ export default {
     },
     checkFinish(count) {
       var this_ = this;
-      if(count > 3){
+      console.log(count);
+      this_.$toast.loading({
+        mask: true,
+        message: "正在制作图书...",
+        duration: 5000
+      });
+      if(count > 10){
+        this_.$toast.clear();
         return;
       }
       var num = 0;
@@ -551,10 +559,12 @@ export default {
         }
       });
       if(num){
-        setTimeout(function(){
+        this_.checktimer = setTimeout(function(){
           this_.getBookDetailInfoFn(this_.vbookid, this_.token);
           this_.checkFinish(count+1)
         },3000);
+      }else{
+        this_.$toast.clear();
       }
     },
     //查看详情 跳转到详情页面传入模板的id
@@ -681,7 +691,7 @@ export default {
 
       if(this_.vbookid){
         this_.getBookDetailInfoFn(this_.vbookid,this_.token);
-        this_.getBookStatusFn(this_.vbookid,this_.token); 
+        this_.getBookStatusFn(this_.vbookid,this_.token);
       }else{
         this_.getTempBookFn(this_.modelid,this_.token);
       }
@@ -689,6 +699,13 @@ export default {
     };
     this_.changesaveflag(false);
     
+  },
+  beforeDestroy(){
+    var this_ = this;
+    if(this_.checktimer) {
+      this_.$toast.clear();
+      clearTimeout(this_.checktimer); //关闭timer
+    }
   },
   computed: {
     ...mapState([
