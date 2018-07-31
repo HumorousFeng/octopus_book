@@ -350,16 +350,7 @@ export default {
       justify-content:center;
       img{
         margin: 0 auto 0.1rem;;
-        width: 0.48rem;
         height: 0.48rem;
-        
-      }
-      .address_icon{
-        width: 0.39rem;
-      }
-      .gift_icon{
-        width: 0.48rem;
-        height: 0.39rem;
       }
     }
       p{
