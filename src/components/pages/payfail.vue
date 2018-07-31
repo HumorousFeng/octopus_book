@@ -1,12 +1,15 @@
 <template>
   <div class="payfail_container">
+    <div class="home_icon" @click="jumptoHome">
+      <img src="../../images/home.png" alt="首页">
+    </div>
     <div class="fail_icon">
       <img src="../../images/warning.png" alt="支付失败">
     </div>
     <p class="tc">支付失败，请重新支付，在个人<br>中心的订单页面中可查看订单信息。</p>
-    <div style="white-space: nowrap;">
-      <div class="detail_next left" @click="jumptodetail">查看详情</div>
-      <div class="detail_next right" @click="jumptopay">继续支付</div>
+    <div class="detail_next">
+      <div class="btn" @click="jumptodetail">查看详情</div>
+      <div class="btn" @click="jumptopay">继续支付</div>
     </div>
   </div>
 </template>
@@ -17,15 +20,15 @@ import UTILS from "../../lib/utils";
 import { mapState, mapMutations } from "vuex";
   export default {
     methods:{
+      jumptoHome(){
+        var this_ = this;
+        this.$router.push({
+          path: '/index',
+          name: 'INDEX'
+        });
+      },
       jumptodetail(){
         var this_ = this;
-        var str=window.location.href;
-        var obj = UTILS.PARAMSREG.paramsregurl(str);
-        console.log(obj);
-        this_.changeOrderId(obj['orderid']);
-        var token = localStorage.getItem('token');
-        this_.changeToken(token);
-        console.log('token'+token);
         this.$router.push({
           path: '/orderdetail',
           name: 'ORDERDETAIL'
@@ -33,13 +36,6 @@ import { mapState, mapMutations } from "vuex";
       },
       jumptopay(){
         var this_ = this;
-        var str=window.location.href;
-        var obj = UTILS.PARAMSREG.paramsregurl(str);
-        console.log(obj);
-        var order_id = obj['orderid'];
-        var token = localStorage.getItem('token');
-        this_.changeToken(token);
-        this_.changeOrderId(order_id);
 
         var paramsobj = {
           service: "payOrder",
@@ -72,6 +68,12 @@ import { mapState, mapMutations } from "vuex";
     mounted(){
       var this_ = this;
       document.title = '支付失败';
+      var str = window.location.href;
+      var obj = UTILS.PARAMSREG.paramsregurl(str);
+      this_.changeOrderId(obj['orderid']);
+      var token = localStorage.getItem('token');
+      this_.changeToken(token);
+      console.log(obj);
     },
     computed:{
       ...mapState([])
@@ -81,36 +83,45 @@ import { mapState, mapMutations } from "vuex";
 
 <style scoped lang="scss" type="text/css">
   .payfail_container{
-    padding-top: 2.2rem;
+    padding-top: 0.5rem;
+    .home_icon{
+      float: right;
+      width: 1rem;
+      height: 1rem;
+      padding-right: 0.2rem;
+      img{
+        width: 100%;
+        height: 100%;
+      }
+    }
     .fail_icon {
+      padding-top: 1.9rem;
       width: 3.14rem;
       height: 2.01rem;
       margin: 0rem auto 0.3rem;
-    img {
-      width: 100%;
-      height: 100%;
-    }
+      img {
+        width: 100%;
+        height: 100%;
+      }
     }
     p {
       font-size: 0.24rem;
       color: #999;
     }
     .detail_next{
-      margin: 1.1rem 0.3rem 0.3rem 0.3rem;
-      width: 3.16rem;
-      height: 1.06rem;
-      line-height: 0.9rem;
-      text-align: center;
-      background: url('../../images/next.png') no-repeat;
-      background-size: cover;
-      font-size: 0.28rem;
-      color: white;
-    }
-    .left{
-      display: inline-block;
-    }
-    .right{
-      display: inline-block;
+      white-space: nowrap;
+      .btn{
+        display: inline-block;
+        margin: 1.1rem 0.5rem 0.5rem 0.5rem;
+        width: 2.8rem;
+        height: 0.86rem;
+        line-height: 0.76rem;
+        text-align: center;
+        background: url('../../images/next.png') no-repeat;
+        background-size: cover;
+        font-size: 0.3rem;
+        color: white;
+      }
     }
   }
 </style>

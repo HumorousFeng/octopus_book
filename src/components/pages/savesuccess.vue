@@ -308,14 +308,14 @@ import { mapState, mapMutations } from "vuex";
       margin-top: 0.2rem;
     }
     .detail_next{
-      margin: 1.1rem auto 0.4rem;
-      width: 3.16rem;
-      height: 1.06rem;
+      margin: 1.1rem 1.88rem 0.5rem;
+      width: 3.2rem;
+      height: 0.86rem;
       line-height: 0.9rem;
       text-align: center;
       background: url('../../images/next.png') no-repeat;
       background-size: cover;
-      font-size: 0.28rem;
+      font-size: 0.3rem;
       color: white;
     } 
    }
