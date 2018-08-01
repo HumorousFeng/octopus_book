@@ -462,6 +462,11 @@ export default {
         return false;
       }
 
+      this_.$toast.loading({
+        mask: true,
+        message: "上传照片1/"+ morenum,
+        duration: 0
+      });
       if(morenum>1){//不止上传一张
         file.forEach((item,index)=>{
           this_.unloadImg(item.file,index+1,morenum);
