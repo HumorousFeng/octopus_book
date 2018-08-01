@@ -53,8 +53,8 @@
         </ul>
         <!-- 使用说明和绑定操作 -->
         <div class="tip_container tc" v-if="active==0">
-          <a href="javascript:;" @click="bindgiftcardFn" class="introduce_icon d-i-b"><i class=" d-i-b"></i>使用说明</a>
-          <a href="javascript:;" @click="giftcardintrucFn" class="bindgift_icon d-i-b" v-if="word_use"><i class=" d-i-b"></i>绑定礼品卡</a>
+          <a href="javascript:;" @click="giftcardintrucFn" class="introduce_icon d-i-b"><i class=" d-i-b"></i>使用说明</a>
+          <a href="javascript:;" @click="bindgiftcardFn" class="bindgift_icon d-i-b" v-if="word_use"><i class=" d-i-b"></i>绑定礼品卡</a>
         </div>
       </div>
     </div>
@@ -73,7 +73,7 @@
     </div>
     
     <!-- 绑定礼品卡 -->
-    <div class="bind_giftcard tc" v-if="!word_use && active==0 " @click="giftcardintrucFn">绑定礼品卡 </div>
+    <div class="bind_giftcard tc" v-if="!word_use && active==0 " @click="bindgiftcardFn">绑定礼品卡 </div>
     <div class="bind_giftcard tc" v-if="word_use" @click="sureusecardFn">确认使用 </div>
     <van-popup v-model="showgift" class="bindgift_container" :overlay-style = "overstyleObj" >
       <div >
@@ -88,7 +88,7 @@
       <div >
          <h4 class="tc">礼品卡使用说明</h4>
          <p >章鱼书礼品为不记名卡，卡有效期自激活之日起36个月有效</p>
-         <div class="sure_btn tc" @click="sureFn()">知道了</div>
+         <div class="sure_btn tc" @click="knowFn()">知道了</div>
       </div>
     </van-popup>
  </div>
@@ -143,8 +143,14 @@ export default {
             giftary.forEach(item =>{
               item.left_price = Number(item.left_price).toFixed(0);
               if(item.status ==1){
-                this_.vailableList.push(item);
                 item.iconflag = false;
+                for(var k in this_.vgiftuserlist){
+                  if(this_.vgiftuserlist[k].id == item.id){
+                    item.iconflag = true;
+                    break;
+                  }
+                }
+                this_.vailableList.push(item);
               }else if(item.status == 2){
                 if(item.left_price == "0"){
                   item.flag=false;
@@ -171,13 +177,12 @@ export default {
     //绑定礼品卡
     bindgiftcardFn() {
       var this_ = this;
-      this_.showgiftinfo = true;
+      this_.showgift = true;
     },
     //礼品卡使用说明
     giftcardintrucFn(){
       var this_ = this;
-      this_.showgift = true;
-
+      this_.showgiftinfo = true;
     },
     //确认使用礼品卡
     sureusecardFn(){
@@ -191,15 +196,17 @@ export default {
       this_.changeGiftlist(selectgift);
       this_.$router.push({  
         path: '/confirmpay',
-        name: 'CONFIRMPAY',  
-        params: {   
-          vailableList: selectgift
-        }
+        name: 'CONFIRMPAY'
       });
     },
     //绑定礼品卡的确认
     sureFn() {
       var this_ = this;
+      if(!this_.giftpassword.length){
+        this_.errorflag = true;
+        this_.message = "请输入礼品卡的密码";
+        return;
+      }
       // 写密码错误时候的相关逻辑
       var obj={
         service:"exchangeCard",
@@ -219,13 +226,9 @@ export default {
         this_.message = error.errMsg;
       });
     },
-
-    oreClose(action, done) {
-      if (action === "confirm") {
-        setTimeout(done, 1000);
-      } else {
-        done();
-      }
+    knowFn(){
+      var this_ = this;
+      this_.showgiftinfo = false;
     },
     ...mapMutations([
       "changeToken","changeObj","changeGiftlist","changeGift"

@@ -48,7 +48,7 @@
              </span>
              <span class="right_con" @click="jumptogift('true')" v-else>
                 <span v-if="giftcardflag">{{giftcardnum}}张可用</span>
-                <span v-if="!giftcardflag">-{{total}}</span>
+                <span v-if="!giftcardflag">-{{discount}}</span>
                <img src="../../images/rightjt.png" alt="无">
              </span>
            </li>
@@ -80,9 +80,8 @@ import { mapState, mapMutations } from "vuex";
         isEdit: false,
         defaultinfo: {}, //默认的收货地址信息
         giftcardnum:0,//可用礼品卡的数量
-        vailableList:null,  //选择确认使用后的礼品卡列表
         giftcardflag:true,   //判断显示几张可用还是可使用的金额
-        total:"", //总共可减少金额
+        discount:"", //总共可减少金额
       }
     },
     computed: {
@@ -152,7 +151,7 @@ import { mapState, mapMutations } from "vuex";
         var this_ = this;
         var cardstr="";
         this_.changeaddress(this_.defaultinfo);
-        this_.vailableList.forEach(item =>{
+        this_.vgiftuserlist.forEach(item =>{
           cardstr+=item.id+",";
         });
         cardstr = cardstr.slice(0,cardstr.length-1);
@@ -268,25 +267,25 @@ import { mapState, mapMutations } from "vuex";
       this_.getAddressListFn(this_.token);
       this_.getUserCardFn(this_.token);
       //选择的礼品卡列表
-      this_.vailableList = this_.vgiftuserlist;
       this_.shopnum = this_.vbuynum;
-      this_.total=0;
-      if(this_.vailableList.length){
+      this_.discount=0;
+      if(this_.vgiftuserlist.length){
         this_.giftcardflag=false;
-        this_.vailableList.forEach(item=>{
-          this_.total+=Number(item.left_price);
+        this_.vgiftuserlist.forEach(item=>{
+          this_.discount+=Number(item.left_price);
         });
-        var totalmoney = this_.modeldatas.price*this_.shopnum;
-        if(this_.total>totalmoney || this_.total == totalmoney){
-          this_.total = totalmoney;
+        var discountmoney = this_.modeldatas.price*this_.shopnum;
+        if(this_.discount>=discountmoney){
+          this_.discount = discountmoney;
         }
+        this_.discount = Number(this_.discount).toFixed(2);
       };
     },
     computed:{
         ...mapState(['token',"bookinfo","vgiftuserlist","vaddressenterflag","vgiftflag","vaddress","vbookid","vbuynum"])
     } ,
     watch:{
-     total(n,o){
+     discount(n,o){
        var this_ = this;
        if(!n == ""){
          this_.paymoney = (this_.modeldatas.price*this_.shopnum - n)*100;
@@ -296,7 +295,18 @@ import { mapState, mapMutations } from "vuex";
        var this_ = this;
        if(!n == ""){
          this_.changebuynum(n);
-         this_.paymoney = (this_.modeldatas.price*n - this_.total)*100;
+         this_.discount = 0;
+         if(this_.vgiftuserlist.length){
+           this_.vgiftuserlist.forEach(item=>{
+             this_.discount+=Number(item.left_price);
+           });
+           var discountmoney = this_.modeldatas.price*this_.shopnum;
+           if(this_.discount>=discountmoney){
+             this_.discount = discountmoney;
+           }
+           this_.discount = Number(this_.discount).toFixed(2);
+         }
+         this_.paymoney = (this_.modeldatas.price*n - this_.discount)*100;
        }
      }
     }  
