@@ -87,6 +87,9 @@ export default {
     //公共
     baseurl(opt) {
       return axios.post(API.BASEINFO.BASEURL, opt); 
+    },
+    uploadurl(){
+      return API.BASEINFO.UPLOADURL;
     }
   }
 }

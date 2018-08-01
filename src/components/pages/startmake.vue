@@ -224,7 +224,7 @@ export default {
   },
   methods: {
     //获取图书所有页面详情 -- 为了获取模板中是否已经有上传的图片了
-    getBookDetailInfoFn(id,token){
+    getBookDetailInfoFn(id,token,isupload){
       var this_ = this;
       var obj = { service: "getBookDetailInfo" , id: id, stoken: token };
       SERVERUTIL.base.baseurl(obj).then(res => {
@@ -234,7 +234,6 @@ export default {
               this_.modelLists = res.data.data;
               console.log(this_.modelLists);
               // 给每个页面增加一个上传图片的url属性
-              var num = 0;
               this_.modelLists.forEach((item,index)=>{
                 if(item.result_img.length){
                   item.imgtrueurl = item.result_img;
@@ -242,12 +241,16 @@ export default {
                   item.imgtrueurl = item.show_img;
                 }
               });
+              if(isupload){
+                this_.checkFinish(1)
+              }
             }else{
               this_.modelLists = [];
             }
           }
         }
       }).catch(error => {
+        this_.$toast.clear();
         console.log(error);
       });
     },
@@ -261,7 +264,7 @@ export default {
           duration:1000
         });
       }else{
-        this_.getBookStatusFn(this_.vbookid, this_.token, false, obj);
+        this_.getBookStatusFn(this_.vbookid, this_.token, obj);
       }
     },
     //获取模板类型
@@ -383,7 +386,7 @@ export default {
 
       formData.append("file", file);
       $.ajax({
-        url:'http://192.144.141.33:8081/book/upload/uploadImage',
+        url:SERVERUTIL.base.uploadurl(),
         type:'POST',
         data:formData,
         cache: false,
@@ -400,18 +403,21 @@ export default {
             console.log(index);
             //每上传一张图片，创建一次图书
             setTimeout(function() {
-              this_.$toast.clear();
               this_.$toast.loading({
                 mask: true,
-                message: "上传图片"+ index +"/"+ count
+                message: "上传照片"+ index +"/"+ count,
+                duration: 0
               });
               this_.makeModelFn(imgurl);
-            }, index*500);
+            }, index*600);
             if(index == count){
               setTimeout(function(){
-                this_.$toast.clear();
-                this_.getBookDetailInfoFn(this_.vbookid, this_.token);
-                this_.getBookStatusFn(this_.vbookid, this_.token, true);
+                this_.$toast.loading({
+                  mask: true,
+                  message: "正在制作图书...",
+                  duration: 0
+                });
+                this_.getBookDetailInfoFn(this_.vbookid, this_.token, true);
               },count*1000);
             }
           }else{
@@ -436,6 +442,7 @@ export default {
       var morenum = file.length || 1;
       var message = "";
 
+      this_.uploadnum = 0;
       //如果是从保存页面返回的，有之前保存的图片的情况
       if(morenum > this_.leftnum) {
         message="最多只能上传"+this_.leftnum+"照片";
@@ -494,7 +501,7 @@ export default {
       });
     },
     //查看图片的上传请况
-    getBookStatusFn(id, token, isupload, objparams) {
+    getBookStatusFn(id, token, objparams) {
       var this_ = this;
       var obj = { service: "getBookStatus", id: id, stoken: token };
       SERVERUTIL.base.baseurl(obj).then(res => {
@@ -531,8 +538,6 @@ export default {
               }).catch(() => {
                   // on cancel
               });
-            }else if(isupload){
-              this_.checkFinish(1)
             }
           }
         }
@@ -542,18 +547,18 @@ export default {
     },
     checkFinish(count) {
       var this_ = this;
-      console.log(count);
       this_.$toast.loading({
         mask: true,
         message: "正在制作图书...",
-        duration: 5000
+        duration: 0
       });
       if(count > 10){
         this_.$toast.clear();
+        this_.getBookStatusFn(this_.vbookid,this_.token);
         return;
       }
       var num = 0;
-      this_.modelLists.forEach((item,index)=>{
+      this_.modelLists.forEach(item=>{
         if(item.source_img.length>0 && item.result_img.length==0){
           num++;
         }
@@ -565,6 +570,7 @@ export default {
         },3000);
       }else{
         this_.$toast.clear();
+        this_.getBookStatusFn(this_.vbookid,this_.token);
       }
     },
     //查看详情 跳转到详情页面传入模板的id
