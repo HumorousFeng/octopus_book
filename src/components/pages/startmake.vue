@@ -44,17 +44,15 @@
               </van-row>
             </div>
           </div>
-           
         </van-col>
         <van-col span="2">
           <div class="scaling scale">
              <img src="../../images/scale.png" alt="" @click="showflag=false;" class="icon_img"/>
-          </div>  
+          </div>
         </van-col>
       </van-row>
-      
     </div>
-     <div class="titleContainer" v-else>
+    <div class="titleContainer" v-else>
       <van-row>
         <van-col span="17" >
            <van-row class="title_con">
@@ -112,14 +110,14 @@
              </div>
              <ul class="prewimg">
                <li v-for="(item,index) in tabLists" :key="index">
-                 <div @click="selectPrewImgFn(index,item)" :class="item.id==modelid?'selDiv':''">
-                   <img :src="item.img" :alt="index" />
+                 <div @click="selectPrewImgFn(index,item)" :class="item.template_id==modelid?'selDiv':'defDiv'">
+                   <img :src="item.show_img" :alt="index" />
                  </div>
                </li>
              </ul>
-          </div>  
+          </div>
         </van-col>
-        </van-row>
+      </van-row>
     </div>
     <!-- 当图片出现不合格的时候弹框 -->
     <div class="imgnofit_container" v-if="nofitflag" :style="{'position':nofitflag?'fixed':'absolute'}">
@@ -257,15 +255,48 @@ export default {
     //右侧的点击每一项更换模板 - 查询上一本书的制作情况，确认更换后 调用选择模板的接口获取新的bookid
     selectPrewImgFn(index, obj) {
       var this_ = this;
-      if(obj.id == this_.modelid){
+      if(obj.template_id == this_.modelid){
         this_.$toast({
           mask: false,
           message: "该模板已被选中",
           duration:1000
         });
       }else{
-        this_.getBookStatusFn(this_.vbookid, this_.token, obj);
+        //更换模板
+        if(this_.leftnum > 0 && this_.finishnum > 0){
+          var content = "当前模板中图片未全部上传，确定更换模板";
+          this_.$dialog.confirm({
+            title: '确认更换',
+            message: content
+          }).then(() => {
+            this_.changeNewMode(obj)
+          }).catch(() => {
+            // on cancel
+          });
+        }else {
+          this_.changeNewMode(obj)
+        }
       }
+    },
+    //切换模板
+    changeNewMode(obj){
+      var this_ = this;
+      this_.$toast.loading({
+        mask: false,
+        message: "正在更换模板...",
+        duration: 1000
+      });
+      this_.modelLists.forEach(item=>{
+        item.imgurl ="";
+      });
+      //获取新的book_id
+      this_.changeModelId(obj.template_id);
+      this_.changeModelName(obj.title);
+      this_.changeModelTypeId(obj.type_id);
+      this_.changeModelTypeName(this_.modeltypevalue);
+      this_.photoName = obj.title;
+      //重新加载图书
+      this_.getTempBookFn(this_.modelid,this_.token,true);
     },
     //获取模板类型
     modelTypeFn() {
@@ -296,7 +327,7 @@ export default {
     //获取右侧不同模板类型下不同模板列表
     modelListFn(typeId) {
       var this_ = this;
-      var obj = { service: "getTemplateList", type_id: typeId };
+      var obj = { service: "getBookImageByTemplateTypeId", type_id: typeId };
       SERVERUTIL.base.baseurl(obj).then(res => {
           if (res.data.code == 0) {
             this_.$toast.clear();
@@ -331,7 +362,7 @@ export default {
               }).catch(() => {
                 // on cancel 制作新的图书
                 this_.getbookidFn(modelid, token, this_.modelname,this_.vnickname)
-              }); 
+              });
             }else{
               // 默认查找之前未完成的图书
               this_.changebookid(res.data.data.id);
@@ -362,7 +393,7 @@ export default {
           if (res.data.data) {
             this_.changebookid(res.data.data.book_id);
             this_.getBookDetailInfoFn(res.data.data.book_id,this_.token);
-            this_.getBookStatusFn(res.data.data.book_id,this_.token); 
+            this_.getBookStatusFn(res.data.data.book_id,this_.token);
           }
         }
       }).catch(error => {
@@ -405,6 +436,7 @@ export default {
             setTimeout(function() {
               this_.$toast.loading({
                 mask: true,
+                forbidClick: true,
                 message: "上传照片"+ index +"/"+ count,
                 duration: 0
               });
@@ -414,6 +446,7 @@ export default {
               setTimeout(function(){
                 this_.$toast.loading({
                   mask: true,
+                  forbidClick: true,
                   message: "正在制作图书...",
                   duration: 0
                 });
@@ -434,7 +467,7 @@ export default {
           });
         }
       });
-      
+
     },
      //上传图片成功的执行函数
     onRead(file) {
@@ -464,6 +497,7 @@ export default {
 
       this_.$toast.loading({
         mask: true,
+        forbidClick: true,
         message: "上传照片1/"+ morenum,
         duration: 0
       });
@@ -494,7 +528,7 @@ export default {
         stoken: this_.token,
         url:url
       };
-     
+
       SERVERUTIL.base .baseurl(obj) .then(res => {
         if (res.data.code == 0) {
           if (res.data.data) {
@@ -506,7 +540,7 @@ export default {
       });
     },
     //查看图片的上传请况
-    getBookStatusFn(id, token, objparams) {
+    getBookStatusFn(id, token) {
       var this_ = this;
       var obj = { service: "getBookStatus", id: id, stoken: token };
       SERVERUTIL.base.baseurl(obj).then(res => {
@@ -515,35 +549,6 @@ export default {
             this_.totalnum = res.data.data.total_num;
             this_.finishnum = res.data.data.finish_num;
             this_.leftnum = this_.totalnum-this_.finishnum;
-            //更换模板
-            if(objparams){
-              var content = "";
-              if(this_.leftnum > 0){
-                content = "当前模板中图片未全部上传，确定更换模板";
-              }
-              this_.$dialog.confirm({
-                title: '确认更换',
-                message: content
-              }).then(() => {
-                this_.$toast.loading({
-                  mask: false,
-                  message: "正在更换模板...",
-                });
-                this_.modelLists.forEach(item=>{
-                  item.imgurl ="";
-                });
-                //获取新的book_id
-                this_.changeModelId(objparams.id);
-                this_.changeModelName(objparams.title);
-                this_.changeModelTypeId(objparams.type_id);
-                this_.changeModelTypeName(this_.modeltypevalue);
-                this_.photoName = objparams.title;
-                //重新加载图书
-                this_.getTempBookFn(this_.modelid,this_.token,true);
-              }).catch(() => {
-                  // on cancel
-              });
-            }
           }
         }
       }).catch(error => {
@@ -554,6 +559,7 @@ export default {
       var this_ = this;
       this_.$toast.loading({
         mask: true,
+        forbidClick: true,
         message: "正在制作图书...",
         duration: 0
       });
@@ -675,7 +681,7 @@ export default {
         setTimeout(() => {
           this.previewFn();
         }, 2000)
-        
+
       }
     },
     ...mapMutations([ "changeToken", "changeNickname", "changeModelTypeId", "changeModelTypeName",
@@ -706,10 +712,10 @@ export default {
       }else{
         this_.getTempBookFn(this_.modelid,this_.token);
       }
-      
+
     };
     this_.changesaveflag(false);
-    
+
   },
   beforeDestroy(){
     var this_ = this;
@@ -805,7 +811,7 @@ body {
                 font-size: 0.28rem;
               }
             }
-            
+
           }
           .van-collapse-item__content{
             padding:0;
@@ -821,8 +827,8 @@ body {
             }
           }
         }
-        
-        
+
+
       }
 
       .prewimg {
@@ -836,11 +842,27 @@ body {
           display: flex;
           flex-direction: column;
           div,
+          .defDiv{
+            margin: 0 auto;
+            max-width: 1.6rem;
+            max-height: 2.2rem;
+            background-size: contain;
+            padding: 5px;
+            box-sizing: border-box;
+            // display: flex;
+            justify-content: center;
+            align-content: center;
+            img{
+              max-width: 90%;
+              max-height: 90%;
+              box-shadow: 0 2px 5px 1px #ddd8df;
+            }
+          }
           .selDiv {
             margin: 0 auto;
             max-width: 1.6rem;
             max-height: 2.2rem;
-            // background: url(../../images/rightbg.png) no-repeat;
+            // background: url(../../images/rightselectbg.png) no-repeat;
             background-size: contain;
             padding: 5px;
             box-sizing: border-box;
@@ -850,7 +872,7 @@ body {
             img {
               max-width: 90%;
               max-height: 90%;
-              box-shadow: 0 2px 5px 1px #E8B5C5;
+              box-shadow: 0 2px 5px 1px #F44;
             }
           }
           // .selDiv {
@@ -1018,7 +1040,7 @@ body {
         .w100 {
           width: 100%;
         }
-        
+
         .fileImage{
             position: absolute;
             display: block;
@@ -1052,7 +1074,7 @@ body {
       }
     }
   }
-  
+
 
 }
 </style>
