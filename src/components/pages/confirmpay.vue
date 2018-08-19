@@ -93,7 +93,7 @@ import { mapState, mapMutations } from "vuex";
       //获取选择的模板数据
       modeldataFn(){
         var this_ = this;
-        this_.modeldatas = this_.bookinfo;
+        this_.modeldatas = this_.paybook;
         this_.paymoney = (Number(this_.modeldatas.price).toFixed(2))*100;
       },
       //获取收货地址列表
@@ -159,7 +159,7 @@ import { mapState, mapMutations } from "vuex";
           var obj={
             service:"addOrder",
             stoken:this_.token,
-            book_id:this_.vbookid,
+            book_id:this_.bookinfo.id,
             num:this_.shopnum,
             address_id:this_.defaultinfo.id,
             price_id:this_.modeldatas.id,
@@ -256,8 +256,8 @@ import { mapState, mapMutations } from "vuex";
         this.chosenContactId = info.id;
       },
        ...mapMutations([
-        "changeToken","changeObj","changeGiftlist","changeEnter","changeGift","changeaddress",
-         "changebookid","changebuynum"
+        "changeToken","changeGiftlist","changeEnter","changeGift","changeaddress",
+         "changebuynum"
        ])
     },
     mounted(){
@@ -282,7 +282,7 @@ import { mapState, mapMutations } from "vuex";
       };
     },
     computed:{
-        ...mapState(['token',"bookinfo","vgiftuserlist","vaddressenterflag","vgiftflag","vaddress","vbookid","vbuynum"])
+        ...mapState(['token',"paybook","bookinfo","vgiftuserlist","vaddressenterflag","vgiftflag","vaddress","vbuynum"])
     } ,
     watch:{
      discount(n,o){

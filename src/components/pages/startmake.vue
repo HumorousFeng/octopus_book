@@ -122,10 +122,13 @@
     <!-- 当图片出现不合格的时候弹框 -->
     <div class="imgnofit_container" v-if="nofitflag" :style="{'position':nofitflag?'fixed':'absolute'}">
       <div class="img_container">
-         <h4 class="tc"><span class="tc" style="color:#ff5547;" v-text="nofitnum"></span><span>张照片像素过低或大小不合格<br>建议删除再重新上传</span></h4>
+         <h4 class="tc"><span class="tc" style="color:#ff5547;" v-text="nofitnum"></span>
+           <span>张照片像素过低或大小不合格<br>建议删除再重新上传<br>(2816 x 2112像素以上, 500K~20M之间)</span>
+         </h4>
          <ul class="img_list">
-           <li v-for="(item,index) in fileList" :key="index">
-             <img v-lazy="item.url" alt="不合格">
+           <li v-for="(item,index) in fileList" :key="index"
+               :style="{'border':item.flag!=0?'1.3px solid #FF0000':'1px solid #000000'}">
+             <img :src="item.image.src" alt="index">
             </li>
          </ul>
          <div class="img_operate w100">
@@ -182,12 +185,11 @@
 
 <script>
 import SERVERUTIL from "../../lib/SeviceUtil";
-import VueCoreImageUpload from "vue-core-image-upload";
 import axios from "axios";
 import { mapState, mapMutations } from "vuex";
 export default {
   components: {
-    VueCoreImageUpload
+
   },
   data() {
     return {
@@ -203,24 +205,42 @@ export default {
       nofitflag: false, //不合格弹框
       nosucceeflag:false , //没有制作成功的弹框
       noprefactflag:false,  //清晰度不高的弹框
-      nofitnum: 1, //不合格的数量
-      imgs: [],
+      nofitnum: 0,   //不合格的数量
+      fileList: [],  //不合格的图片的数据集
       imgData: {
         accept: "image/gif, image/jpeg, image/png, image/jpg, image/bmp"
       },
       bookinfos:{}, //获取到的图书的信息
-      fileList: [],  //不合格的图片的数据集
-      uploadnum:0,  // 上传的图片的数量 执行一次上传，增加1
       makenum:0,  //制作成功的数量
       loadflag:false,  //判断是否点击了上传按钮
       canusenum:0, //从制作成功返回的可用的图片张数
       totalnum:0, //获取当前模板可以上传的最大图片数
       finishnum:0, //获取当前模板已经上传成功的图片数量
-      checktimer:null
+      checktimer:null,
+      imagelimit: {width: 2816, height:2112, min_size:1024*500, max_size:1024*1024*20}
+      // 2048 X 1536 3145728 320万
+      // 2304 X 1728 3981312 400万
+      // 2580 X 1936 4994880 500万
+      // 2816 X 2112 5947392 600万
 
     };
   },
   methods: {
+    //获取图书基本信息
+    getBookInfo(id,token){
+      var this_ = this;
+      var obj = { service: "getBookInfo" , id: id, stoken: token };
+      SERVERUTIL.base.baseurl(obj).then(res => {
+        if (res.data.code == 0) {
+          if (res.data.data) {
+            this_.changeBookInfo(res.data.data);
+          }
+        }
+      }).catch(error => {
+          this_.$toast.clear();
+        console.log(error);
+      });
+    },
     //获取图书所有页面详情 -- 为了获取模板中是否已经有上传的图片了
     getBookDetailInfoFn(id,token,isupload){
       var this_ = this;
@@ -356,7 +376,7 @@ export default {
                 confirmButtonText: '编辑图书',
                 cancelButtonText: '制作图书'
               }).then(() => {
-                this_.changebookid(res.data.data.id);
+                this_.getBookInfo(res.data.data.id,this_.token);
                 this_.getBookDetailInfoFn(res.data.data.id,this_.token);
                 this_.getBookStatusFn(res.data.data.id,this_.token);
               }).catch(() => {
@@ -365,7 +385,7 @@ export default {
               });
             }else{
               // 默认查找之前未完成的图书
-              this_.changebookid(res.data.data.id);
+              this_.getBookInfo(res.data.data.id,this_.token);
               this_.getBookDetailInfoFn(res.data.data.id,this_.token);
               this_.getBookStatusFn(res.data.data.id,this_.token);
             }
@@ -391,7 +411,7 @@ export default {
       SERVERUTIL.base.baseurl(obj).then(res => {
         if (res.data.code == 0) {
           if (res.data.data) {
-            this_.changebookid(res.data.data.book_id);
+            this_.getBookInfo(res.data.data.book_id,this_.token);
             this_.getBookDetailInfoFn(res.data.data.book_id,this_.token);
             this_.getBookStatusFn(res.data.data.book_id,this_.token);
           }
@@ -401,7 +421,7 @@ export default {
       });
     },
     //上传图片
-    unloadImg(file,index,count){
+    uploadImg(file,index,count){
       var this_ = this;
       this_.loadflag = true;
       let formData = new FormData();
@@ -427,10 +447,7 @@ export default {
         success:function(res){
           if(res.data && res.data.url){
             var imgurl=res.data.url;
-            if (file.size > 3145728 || file.size < 102400) {
-              this_.fileList.push({url:imgurl,index:this_.uploadnum});
-            };
-            this_.uploadnum++;
+
             console.log(index);
             //每上传一张图片，创建一次图书
             setTimeout(function() {
@@ -450,7 +467,7 @@ export default {
                   message: "正在制作图书...",
                   duration: 0
                 });
-                this_.getBookDetailInfoFn(this_.vbookid, this_.token, true);
+                this_.getBookDetailInfoFn(this_.bookinfo.id, this_.token, true);
               },count*1000);
             }
           }else{
@@ -475,7 +492,6 @@ export default {
       var morenum = file.length || 1;
       var message = "";
 
-      this_.uploadnum = 0;
       //如果是从保存页面返回的，有之前保存的图片的情况
       if(morenum > this_.leftnum) {
         message="最多只能上传"+this_.leftnum+"照片";
@@ -495,18 +511,80 @@ export default {
         return false;
       }
 
-      this_.$toast.loading({
-        mask: true,
-        forbidClick: true,
-        message: "上传照片1/"+ morenum,
-        duration: 0
-      });
       if(morenum>1){//不止上传一张
         file.forEach((item,index)=>{
-          this_.unloadImg(item.file,index+1,morenum);
+          this_.makeFileList(item, index);
         });
       }else{ //只上传一张
-        this_.unloadImg(file.file,1,morenum);
+        this_.makeFileList(file, 1);
+      }
+      this_.checkImage(morenum);
+    },
+    makeFileList(file, index){
+      var this_ = this;
+      var flag = 0;
+      var image = new Image();
+      image.src = file.content;
+      image.onload = function () {
+        var sizeflag = file.file.size >= this_.imagelimit.min_size && file.file.size <= this_.imagelimit.max_size;
+        var pxflag = (image.width >= this_.imagelimit.width && image.height >= this_.imagelimit.height) ||
+                     (image.width >= this_.imagelimit.height && image.height >= this_.imagelimit.width);
+        if(!sizeflag){
+          this_.nofitnum++;
+          flag = 1;
+        }else if(!pxflag){
+          this_.nofitnum++;
+          flag = 2
+        }
+        console.log(flag);
+        this_.fileList.push({index:index, file:file.file, image:image, flag:flag})
+      }
+    },
+    checkImage(morenum){
+      var this_ = this;
+      if(this_.fileList.length != morenum){
+        setTimeout(function(){
+          this_.$toast.loading({
+            mask: false,
+            forbidClick: true,
+            message: "正在检查照片",
+            duration: 0
+          });
+          this_.checkImage(morenum)
+        },200);
+      }else{
+        this_.$toast.clear();
+        if(this_.nofitnum > 0){
+          this_.nofitflag = true;
+        }else{
+          this_.uploadImgStart();
+        }
+      }
+    },
+    uploadImgStart(){
+      var this_ = this;
+      var list = [];
+      this_.fileList.forEach(item => {
+        if(item.flag==0){
+          list.push(item.file)
+        }
+      });
+      var morenum = list.length;
+      console.log('total:' + this_.fileList.length);
+      console.log('upload:' + morenum);
+      this_.nofitnum = 0;
+      this_.fileList = [];
+
+      if(morenum>0){
+        this_.$toast.loading({
+          mask: true,
+          forbidClick: true,
+          message: "上传照片1/"+ morenum,
+          duration: 0
+        });
+        list.forEach((item,index)=>{
+          this_.uploadImg(item,index+1,morenum);
+        });
       }
     },
     //当上传的图片数已满时，继续上传的操作 提示不可再传
@@ -524,7 +602,7 @@ export default {
       var this_ = this;
       var obj = {
         service: "createBook",
-        id: this_.vbookid,
+        id: this_.bookinfo.id,
         stoken: this_.token,
         url:url
       };
@@ -565,7 +643,7 @@ export default {
       });
       if(count > 10){
         this_.$toast.clear();
-        this_.getBookStatusFn(this_.vbookid,this_.token);
+        this_.getBookStatusFn(this_.bookinfo.id,this_.token);
         return;
       }
       var num = 0;
@@ -576,12 +654,12 @@ export default {
       });
       if(num){
         this_.checktimer = setTimeout(function(){
-          this_.getBookDetailInfoFn(this_.vbookid, this_.token);
+          this_.getBookDetailInfoFn(this_.bookinfo.id, this_.token);
           this_.checkFinish(count+1)
         },3000);
       }else{
         this_.$toast.clear();
-        this_.getBookStatusFn(this_.vbookid,this_.token);
+        this_.getBookStatusFn(this_.bookinfo.id,this_.token);
       }
     },
     //查看详情 跳转到详情页面传入模板的id
@@ -591,7 +669,7 @@ export default {
         path: "/detail",
         name: "DETAIL",
         params: {
-          bookid: this_.vbookid
+          bookid: this_.bookinfo.id
         }
       });
     },
@@ -620,27 +698,15 @@ export default {
     //大小不合格的取消操作
     cancleImgFn(){
       var this_ = this;
-      alert("取消");
-      // this_.nofitflag=false;
-      // this_.fileList.forEach((item,index)=>{
-      //   this_.modelLists[item.index].warnflag =true;
-      // });
-      // this_.failimgflag = true;
-      // this_.changefailimg(this_.fileList);
-      // this_.saveFn();
+      this_.nofitflag = false;
+      this_.nofitnum = 0;
+      this_.fileList = [];
     },
     //删除图片
     deleteImgFn(){
       var this_ = this;
-      alert("删除");
-      // this_.nofitflag = false;
-      // this_.fileList.forEach((item,index)=>{
-      //   this_.modelLists[item.index].imgtrueurl =item.show_img;
-      //   this_.leftnum++;
-      //   this_.uploadnum--;
-      // });
-      // this_.fileList=[];
-      // this_.changefailimg(this_.fileList);
+      this_.nofitflag = false;
+      this_.uploadImgStart();
     },
     //预览功能
     previewFn() {
@@ -685,7 +751,7 @@ export default {
       }
     },
     ...mapMutations([ "changeToken", "changeNickname", "changeModelTypeId", "changeModelTypeName",
-      "changeModelId", "changeModelName", "changebookid","changeimg","changefailimg","changesaveflag"
+      "changeModelId", "changeModelName", "changeBookInfo","changefailimg","changesaveflag"
     ])
   },
   mounted() {
@@ -706,9 +772,9 @@ export default {
       };
       this_.modelTypeFn();
 
-      if(this_.vbookid){
-        this_.getBookDetailInfoFn(this_.vbookid,this_.token);
-        this_.getBookStatusFn(this_.vbookid,this_.token);
+      if(this_.bookinfo.id){
+        this_.getBookDetailInfoFn(this_.bookinfo.id,this_.token);
+        this_.getBookStatusFn(this_.bookinfo.id,this_.token);
       }else{
         this_.getTempBookFn(this_.modelid,this_.token);
       }
@@ -732,7 +798,7 @@ export default {
       "modeltypename",
       "modelid",
       "modelname",
-      "vbookid","vloadimg","vfailimgary","vsavetoeditflag"
+      "bookinfo","vfailimgary","vsavetoeditflag"
     ])
   }
 };
@@ -1021,9 +1087,9 @@ body {
           display: inline-block;
           width: 1.6rem;
           height: 1.6rem;
-          margin: 0.12rem;
+          margin: 0.11rem;
           background: #ccc;
-          border: 1px solid black;
+          /*border: 1px solid #000000;*/
           img {
             width: 100%;
             height: 100%;

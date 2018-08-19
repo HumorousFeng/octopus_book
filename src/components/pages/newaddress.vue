@@ -182,7 +182,7 @@ import { mapState, mapMutations } from "vuex";
        });
      },
      ...mapMutations([
-        "changeToken","changeObj","changeGiftlist","changeEnter","changeaddress"
+        "changeToken","changeGiftlist","changeEnter","changeaddress"
       ])
     },
     mounted() {

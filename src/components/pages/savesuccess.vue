@@ -146,7 +146,7 @@ import { mapState, mapMutations } from "vuex";
       //点击下一步跳到付款页面
       jumptopay(obj){
         var this_ = this;
-        this_.changeObj(obj);
+        this_.changePayBook(obj);
         this.$router.push({
           path: '/confirmpay',
           name: 'CONFIRMPAY',
@@ -165,7 +165,7 @@ import { mapState, mapMutations } from "vuex";
          alert('分享');
        },
        ...mapMutations([
-        "changeToken","changeObj","changesaveflag"
+        "changeToken","changePayBook","changesaveflag"
        ])
      },
      mounted(){
@@ -177,12 +177,12 @@ import { mapState, mapMutations } from "vuex";
       }else{
         this_.changesaveflag(true);
       };
-      this_.getBookDetailInfoFn(this_.token,this_.vbookid);
+      this_.getBookDetailInfoFn(this_.token,this_.bookinfo.id);
       this_.modelDetailFn(this_.modelid);
       
     },
     computed:{
-      ...mapState(['token',"modelid","bookinfo","vbookid"])
+      ...mapState(['token',"modelid","bookinfo"])
     }       
   }
 </script>

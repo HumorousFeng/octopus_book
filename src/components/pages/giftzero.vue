@@ -231,7 +231,7 @@ export default {
       this_.showgiftinfo = false;
     },
     ...mapMutations([
-      "changeToken","changeObj","changeGiftlist","changeGift"
+      "changeToken","changeGiftlist","changeGift"
     ])
   },
   mounted() {

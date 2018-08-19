@@ -7,22 +7,21 @@ Vue.use(Vuex);
 
 
 const state = {
-  token:"", 
+  token:"",
   vnickname:"", //名称作者
   modeltypeid:"",  //模板类型的id
   modeltypename:"",//模板类型的名称
   modelid:"",  //选择的模板的id
   modelname:"",//模板名称
-  bookinfo:{}, //保存成功的制作相册的下一步时保存的图书信息
+  bookinfo:{}, //图书信息
   vgiftuserlist:[], //礼品卡使用的数量
   vgiftflag:true, // 礼品卡的入口 false-个人中心   true -- 确认支付
   vaddressenterflag:false, //地址管理的入口 false-确认支付   true -- 个人中心
   vaddress:"",  //最后收货地址
   vbuynum:1, //购买数量
-  vbookid:"", //获取book_id
-  vloadimg:[],//上传的图片
   vfailimgary:[], //不合格的图片列表,
   vsavetoeditflag:false, //从保存到编辑页面
+  paybook:{}, //保存成功的制作相册的下一步时保存的图书信息
   orderid:"", //订单id
 }
 
@@ -51,9 +50,13 @@ const mutations = {
   changeModelName(state, value){
     state.modelname = value;
   },
-  //保存成功的制作相册的下一步时保存的图书信息
-  changeObj(state,value){
+  //图书信息
+  changeBookInfo(state,value){
     state.bookinfo=value;
+  },
+  //保存成功的制作相册的下一步时保存的图书信息
+  changePayBook(state,value){
+    state.paybook=value;
   },
    //礼品卡使用的数量
   changeGiftlist(state,value){
@@ -74,14 +77,6 @@ const mutations = {
   //购买数量
   changebuynum(state,value){
     state.vbuynum=value;
-  },
-  //获取book_id 在立即支付的时候使用
-  changebookid(state,value){
-    state.vbookid=value;
-  },
-  //获取上传成功的图片
-  changeimg(state,value){
-    state.vloadimg=value;
   },
   //获取上传成功的图片
   changefailimg(state,value){

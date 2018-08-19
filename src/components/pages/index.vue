@@ -154,14 +154,14 @@ import { mapState, mapMutations } from "vuex";
         })
       },
       ...mapMutations([
-      "changeToken","changeNickname","changeModelTypeId","changeModelTypeName","changeModelId","changeModelName","changebookid"
+      "changeToken","changeNickname","changeModelTypeId","changeModelTypeName","changeModelId","changeModelName","changeBookInfo"
     ])
       
     },
     mounted(){
       var this_ = this;
       document.title = '首页';
-      this_.changebookid("");
+      this_.changeBookInfo({});
       this_.modelTypeFn();
       //this_.userLoginFn();
       if(this_.modeltypeid){

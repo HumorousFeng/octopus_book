@@ -163,7 +163,7 @@ export default {
       this_.changeModelTypeName(this_.bookOne.type_name);
       this_.changeModelId(this_.bookOne.template_id);
       this_.changeModelName(this_.bookOne.book_name);
-      this_.changebookid(this_.bookOne.id);
+      this_.changeBookInfo(this_.bookOne);
       this.$router.push({  
         path: '/savesuccess',
         name: 'SAVESUCCESS',  
@@ -175,7 +175,7 @@ export default {
     //编辑图书 -- 跳转到保存页面，不过是可以编辑
     jumptosave(obj){
       var this_ = this;
-      this_.changebookid(obj.id);
+      this_.changeBookInfo(obj);
       this_.$router.push({  
         path: '/editimg',
         name: 'EDITIMG' 
@@ -232,14 +232,21 @@ export default {
     //制作相册 --- 跳转到马上制作页面
     jumptostartmakeFn(paramobj){
       var this_ = this;
-      this_.changeModelTypeId(paramobj.type_id);
-      this_.changeModelTypeName(paramobj.type_name);
-      this_.changeModelId(paramobj.template_id);
-      this_.changeModelName(paramobj.book_name);
-      this_.changebookid(paramobj.id);
+      var quickmake = true;
+      if(paramobj.type_id){
+        this_.changeModelTypeId(paramobj.type_id);
+        this_.changeModelTypeName(paramobj.type_name);
+        this_.changeModelId(paramobj.template_id);
+        this_.changeModelName(paramobj.book_name);
+        this_.changeBookInfo(paramobj);
+        quickmake = false;
+      }
       this.$router.push({
         path: '/startmake',
-        name: 'STARTMAKE'
+        name: 'STARTMAKE',
+        params: {
+          quickmake: quickmake
+        }
       }) ;
     },
     //修改用户名昵称
@@ -267,7 +274,7 @@ export default {
      this.editflag =true;
     },
     ...mapMutations([
-      "changeToken","changeModelId","changeModelName","changeModelTypeId","changeModelTypeName","changeEnter","changeGift","changebookid",
+      "changeToken","changeModelId","changeModelName","changeModelTypeId","changeModelTypeName","changeEnter","changeGift","changeBookInfo",
     ])
   },
   mounted() {
@@ -283,7 +290,7 @@ export default {
     this_.getUserCardFn(this_.token);
   },
   computed:{
-    ...mapState(['token',"modelid","modeltypeid","modeltypename","vaddressenterflag","vgiftflag","vbookid" ])
+    ...mapState(['token',"modelid","modeltypeid","modeltypename","vaddressenterflag","vgiftflag" ])
   }
 };
 </script>

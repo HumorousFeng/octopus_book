@@ -68,7 +68,7 @@ import { mapState, mapMutations } from "vuex";
         });
       },
       ...mapMutations([
-        "changeToken","changebookid"
+        "changeToken","changeBookInfo"
       ])
     },
     mounted(){
@@ -77,7 +77,7 @@ import { mapState, mapMutations } from "vuex";
       document.title = this_.detailtitle;
       this_.modelDetailFn(this_.modelid);
       if(!this_.$route.params.bookid){
-        this_.changebookid("");
+        this_.changeBookInfo({});
       }
     },
     computed:{

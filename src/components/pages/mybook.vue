@@ -36,6 +36,12 @@ import { mapState, mapMutations } from "vuex";
           if(res.data.code ==0){
             if(res.data.data){
               this_.booklists=res.data.data;
+              if(!this_.booklists.length){
+                this.$router.push({
+                  path: '/index',
+                  name: 'INDEX',
+                });
+              }
             }
           }
         }).catch(error => {
@@ -108,10 +114,10 @@ import { mapState, mapMutations } from "vuex";
         this_.changeModelTypeName(obj.type_name);
         this_.changeModelId(obj.template_id);
         this_.changeModelName(obj.book_name);
-        this_.changebookid(obj.id);
+        this_.changeBookInfo(obj);
       },
       ...mapMutations([
-        "changeToken","changeModelId","changeModelName","changeModelTypeId","changeModelTypeName","changeEnter","changeGift","changebookid"
+        "changeToken","changeModelId","changeModelName","changeModelTypeId","changeModelTypeName","changeEnter","changeGift","changeBookInfo"
       ])
 
     },

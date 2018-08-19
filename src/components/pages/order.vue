@@ -32,7 +32,7 @@
     <div v-else class="no_order">
        <div class="no_order_tip">
            <img src="../../images/noorder.png" alt="暂无订单">
-       </div> 
+       </div>
        <p class="tc">还没有订单哦</p>
     </div>
   </div>
@@ -77,27 +77,27 @@ import { mapState, mapMutations } from "vuex";
                   }else  if(item.status == 2){
                     item.chinaStatus = '已取消';
                   }else  if(item.status == 3){
-                    item.chinaStatus = '已付款，待印刷'; 
+                    item.chinaStatus = '已付款，待印刷';
                   }else  if(item.status == 4){
                     item.chinaStatus = '已发货';
-                    item.paymoneybtn=true; 
+                    item.paymoneybtn=true;
                     item.paymoneytext=true;
                   }else  if(item.status == 5){
-                    item.chinaStatus = '已签收'; 
+                    item.chinaStatus = '已签收';
                   }else  if(item.status == 6){
-                    item.chinaStatus = '已完成'; 
+                    item.chinaStatus = '已完成';
                   };
-                }); 
+                });
               }else{
                 this_.orderflag = false;
               }
-             
+
             }
           }
         }).catch(error => {
           console.log(error);
         });
-       
+
       },
       showOrDel(status,obj){
         var this_ = this;
@@ -135,13 +135,13 @@ import { mapState, mapMutations } from "vuex";
           return;
         }
         this_.changeOrderId(obj.order_id);
-        this.$router.push({  
+        this.$router.push({
           path: '/orderdetail',
-          name: 'ORDERDETAIL', 
-          params: {   
+          name: 'ORDERDETAIL',
+          params: {
             status: status,
             data:obj
-          }, 
+          },
         }) ;
       },
       //继续支付和物流详情操作
@@ -150,10 +150,10 @@ import { mapState, mapMutations } from "vuex";
         //flag -true 物流详情
         //flag -false  继续支付
         if(flag){
-          this.$router.push({  
+          this.$router.push({
             path: '/logistics',
             name: 'LOGISTICS',
-            params: {   
+            params: {
               id:obj.id
             }
           }) ;
@@ -227,8 +227,8 @@ import { mapState, mapMutations } from "vuex";
       document.title = "我的订单";
       this_.userid = this_.$route.params.id;
       this_.orderFn();
-      
-    }, 
+
+    },
     computed:{
       ...mapState(['token'])
     }
@@ -294,7 +294,7 @@ import { mapState, mapMutations } from "vuex";
             width: 1.6rem;
             height: 0.6rem;line-height: 0.6rem;
             background: url(../../images/orderbtn.png) no-repeat;
-            background-size:100% 100%; 
+            background-size:100% 100%;
             margin-right: 0.3rem;
             margin-top: 0.2rem;
             color: #ff5547;
