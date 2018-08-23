@@ -29,9 +29,20 @@
                 <van-col span="8">
                   <span class="onload_icon d-i-b">
                     <!-- <form ref="form"></form> -->
-                    <van-uploader :after-read="onRead"  :accept="imgData.accept" multiple class="fileImage" v-if="leftnum>0">
-                      <van-icon name="photograph" />
-                    </van-uploader>
+                    <!--<van-uploader :after-read="onRead"  :accept="imgData.accept" multiple multiple-size="5" class="fileImage" v-if="leftnum>0">-->
+                      <!--<van-icon name="photograph" />-->
+                    <!--</van-uploader>-->
+                    <vue-core-image-upload
+                        class="fileImage"
+                        :crop="false"
+                        @imagechanged="onRead"
+                        :max-file-size="5242880"
+                        :multiple="true"
+                        :multiple-size="4"
+                        :url="uploadUrl"
+                        >
+                    </vue-core-image-upload>
+
                     <img src="../../images/onload.png" alt="上传" @click="completeFn()">
                     <span v-if="leftnum>0" class="mark tc" v-text="leftnum"></span>
                   </span>
@@ -187,9 +198,10 @@
 import SERVERUTIL from "../../lib/SeviceUtil";
 import axios from "axios";
 import { mapState, mapMutations } from "vuex";
+import VueCoreImageUpload from 'vue-core-image-upload'
 export default {
   components: {
-
+    'vue-core-image-upload': VueCoreImageUpload,
   },
   data() {
     return {
@@ -208,7 +220,7 @@ export default {
       nofitnum: 0,   //不合格的数量
       fileList: [],  //不合格的图片的数据集
       imgData: {
-        accept: "image/gif, image/jpeg, image/png, image/jpg, image/bmp"
+        accept: "image/*"
       },
       bookinfos:{}, //获取到的图书的信息
       makenum:0,  //制作成功的数量
@@ -217,7 +229,8 @@ export default {
       totalnum:0, //获取当前模板可以上传的最大图片数
       finishnum:0, //获取当前模板已经上传成功的图片数量
       checktimer:null,
-      imagelimit: {width: 2816, height:2112, min_size:1024*500, max_size:1024*1024*20}
+      imagelimit: {width: 2816, height:2112, min_size:1024*500, max_size:1024*1024*20},
+      uploadUrl: SERVERUTIL.base.uploadurl()
       // 2048 X 1536 3145728 320万
       // 2304 X 1728 3981312 400万
       // 2580 X 1936 4994880 500万
@@ -491,6 +504,9 @@ export default {
       var this_ = this;
       var morenum = file.length || 1;
       var message = "";
+
+      console.log(file[0]);
+      return;
 
       //如果是从保存页面返回的，有之前保存的图片的情况
       if(morenum > this_.leftnum) {
