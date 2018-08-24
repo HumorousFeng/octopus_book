@@ -56,11 +56,9 @@ import { mapState, mapMutations } from "vuex";
           message: '确定要删除此相册吗？'
         }).then(() => {
           var paramsobj={
-            service: "setBook",
+            service: "setBookStatus",
             id: item.id,
             stoken: this_.token,
-            book_name: item.book_name,
-            author: item.author,
             status: status
           };
           SERVERUTIL.base.baseurl(paramsobj).then(res => {
@@ -91,21 +89,21 @@ import { mapState, mapMutations } from "vuex";
       previewFn(obj){
         var this_ = this;
         this_.selectBook(obj);
-        this.$router.push({  
+        this.$router.push({
           path: '/savesuccess',
-          name: 'SAVESUCCESS',  
+          name: 'SAVESUCCESS',
           params: {
             title:"预览"
           }
-        }) 
+        })
       },
       //编辑图书 -- 跳转到保存页面，不过是可以编辑
       jumptosave(obj){
         var this_ = this;
         this_.selectBook(obj);
-        this_.$router.push({  
+        this_.$router.push({
           path: '/editimg',
-          name: 'EDITIMG' 
+          name: 'EDITIMG'
         });
       },
       selectBook(obj){
@@ -128,26 +126,26 @@ import { mapState, mapMutations } from "vuex";
     } ,
     computed:{
       ...mapState(['token'])
-    }   
+    }
   }
 </script>
 
 <style scoped lang="scss" type="text/css">
 .book_container{
    padding: 0.3rem 0rem 0 0.5rem;
-   box-sizing: border-box; 
+   box-sizing: border-box;
    .book_item{
       margin-bottom:0.6rem;
       border-bottom:1px solid #ccc;
       padding-bottom:0.3rem;
-      box-sizing: border-box; 
+      box-sizing: border-box;
       display: flex;
       justify-content: center;
       align-items: center;
-   
+
       .title_left{
         position: relative;
-    
+
         img{
           max-width:100%;
           max-height: 4rem;
@@ -163,7 +161,7 @@ import { mapState, mapMutations } from "vuex";
         }
         i.fail_status{
           background: url(../../images/fail.png) no-repeat;
-          background-size: 100% 100%;  
+          background-size: 100% 100%;
         }
       }
       .content-right{
@@ -201,7 +199,7 @@ import { mapState, mapMutations } from "vuex";
         }
     }
    }
-  
+
 }
 
 </style>

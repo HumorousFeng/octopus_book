@@ -17,7 +17,8 @@
         <span v-if="index == 0" class="cover img_title">封面</span>
         <span v-else v-text="index" class="img_title"></span>
         <div>
-          <img  v-lazy="item.imgtrueurl" alt="1"/>
+          <img v-if="index == 0" ref="coverRef"  v-lazy="item.imgtrueurl" alt="1"/>
+          <img v-else v-lazy="item.imgtrueurl" alt="1"/>
 
 
           <!--<ul v-if="item.liflag" class="icon_container">-->
@@ -27,19 +28,21 @@
             <!--<li ><i class="narrow_icon"></i><span >缩小</span></li>-->
           <!--</ul>-->
         </div>
-        <div v-if="index == 0" class="book_name">
-          <span v-text="book.book_name" v-if="editflag!=1"></span>
-          <input type="text" v-model="bookname" v-else @blur="changeNameFn($event, 1)">
-          <span @click="editNameFn($event, 1)"><img src="../../images/editbook.png" alt=""></span>
-        </div>
-        <div v-if="index == 0" class="book_author">
-          <span v-text="book.author" v-if="editflag!=2"></span>
-          <input type="text" v-model="bookauthor" v-else @blur="changeNameFn($event, 2)">
-          <span @click="editNameFn($event, 2)"><img src="../../images/editbook.png" alt=""></span>
+        <div v-if="index == 0 && editicon.left" class="book_name">
+          <span :style="editicon" @click="editNameFn($event)"><img src="../../images/editbook.png" alt=""></span>
         </div>
 
        </li>
     </ul>
+    <van-popup v-model="editflag" class="bindgift_container" :overlay-style = "overstyleObj" >
+      <div >
+        <h4 class="tc">编辑书名</h4>
+        <div class="ps_input">书&nbsp;&nbsp;&nbsp;名：<input type="text" v-model="bookname" placeholder="请输入书名"></div>
+        <div class="ps_input">作者名：<input type="text" v-model="bookauthor" placeholder="请输入作者名"></div>
+        <div class="sure_btn tc" @click="changeNameFn">确定</div>
+      </div>
+    </van-popup>
+
     <!--<div class="btn_container">-->
       <!--<van-button bottom-action>保存</van-button>-->
     <!--</div>-->
@@ -59,14 +62,20 @@ import { mapState, mapMutations } from "vuex";
         imgurl: "",
         modelLists: [], //列表
         book: {},
-        editflag: 0,
-        bookname:"",
-        bookauthor:""
+        editflag: false,    //编辑标识
+        overstyleObj: {
+          //蒙层样式
+          background: "rgba(0,0,0,0.3)"
+        },
+        bookname:"",    //书名
+        bookauthor:"",  //作者
+        coverRealImg:{},//封面图片
+        editicon:{}
       }
     },
     methods:{
       //获取图书基本信息
-      getBookInfo(id,token){
+      getBookInfo(token, id){
         var this_ = this;
         var obj = { service: "getBookInfo" , id: id, stoken: token };
         SERVERUTIL.base.baseurl(obj).then(res => {
@@ -92,7 +101,7 @@ import { mapState, mapMutations } from "vuex";
               this_.modelLists = res.data.data;
               var imgary = [];
               if(this_.modelLists.length){
-                this_.modelLists.forEach(item =>{
+                this_.modelLists.forEach((item, index) =>{
                   if(item.result_img.length){
                     item.imgtrueurl= item.result_img;
                     item.liflag=true;
@@ -102,6 +111,16 @@ import { mapState, mapMutations } from "vuex";
                     item.liflag=false;
                     imgary.push({"imgtrueurl":item.imgtrueurl,"flag":false});
                   };
+                  if(index == 0){
+                    this_.coverRealImg = new Image();
+                    this_.coverRealImg.src = item.imgtrueurl;
+                    this_.coverRealImg.onload = function () {
+                      var naturalWidth = this_.coverRealImg.width;
+                      var naturalHeight = this_.coverRealImg.height;
+                      var curImg = this_.$refs.coverRef[0];
+                      this_.editIconPos(curImg.x, curImg.y, curImg.width, curImg.height, naturalWidth, naturalHeight)
+                    }
+                  };
                 });
               }
             }
@@ -110,21 +129,41 @@ import { mapState, mapMutations } from "vuex";
           console.log(error);
         });
       },
-      changeNameFn(e, flag){
+      editIconPos(x, y, width, height, naturalWidth, naturalHeight){
         var this_ = this;
-        this_.editflag = 0;
-        var len = 0;
+        console.log("x:"+x+" y:"+y+" width:"+width+" height:"+height+" naturalWidth:"+naturalWidth+" naturalHeight:"+naturalHeight);
+        var realX = this_.book.position['x'];
+        var realY = this_.book.position['Y'];
+        var size = this_.book.position['size'];
+        var realSize = Math.ceil(this_.strlen(this_.book.book_name)/2/2 * size * width / naturalWidth);
+        console.log("realSize:"+realSize);
+        console.log("realX:"+realX+" realY:"+realY);
+        realX = Math.ceil(realX *  width / naturalWidth) + realSize;
+        realY = Math.ceil((realY - size/2) *  height / naturalHeight) - 5 ;
+        console.log("x:" + realX + " y:" + realY);
+        this_.editicon = {
+          'width': '0.5rem',
+          'height': '0.5rem',
+          'position': 'absolute',
+          'left':realX+'px', 'top':realY+'px'}
+
+      },
+      changeNameFn(){
+        var this_ = this;
         var message = "";
-        if(flag == 1){
-          len = this_.strlen(this_.bookname)
-        }else{
-          len = this_.strlen(this_.bookauthor)
-        };
-        if(len==0){
-          message = flag==1 ? '书名不能为空' : '作者名不能为空';
-        }else if(len>20){
-          message = flag==1 ? '书名不能超过10个中文字符 或 20个英文字符' : '作者名不能超过10个中文字符 或 20个英文字符';
+        var len1 = this_.strlen(this_.bookname);
+        var len2 = this_.strlen(this_.bookauthor);
+
+        if(len1==0){
+          message = '书名不能为空';
+        }else if(len1>20){
+          message = '书名不能超过10个中文字符 或 20个英文字符';
+        }else if(len2==0){
+          message = '作者名不能为空';
+        }else if(len2>20){
+          message = '作者名不能超过10个中文字符 或 20个英文字符';
         }
+
         if(message.length){
           this_.$toast({
             mask: true,
@@ -134,6 +173,7 @@ import { mapState, mapMutations } from "vuex";
           });
           return false;
         }else if(this_.bookname == this_.book.book_name && this_.bookauthor == this_.book.author){
+          this_.editflag = false;
           return true;
         }
         var paramsobj = {
@@ -141,12 +181,13 @@ import { mapState, mapMutations } from "vuex";
           id: this_.book.id,
           stoken: this_.token,
           book_name: this_.bookname,
-          author: this_.bookauthor,
-          status: this_.book.status
+          author: this_.bookauthor
         };
         SERVERUTIL.base.baseurl(paramsobj).then(res => {
           if(res.data.code == 0){
-            this_.getBookInfo(this_.book.id, this_.token);
+            this_.editflag = false;
+            this_.getBookInfo(this_.token, this_.book.id);
+            this_.getBookDetailInfoFn(this_.token, this_.book.id);
           }
         }).catch(error => {
           console.log(error);
@@ -167,19 +208,20 @@ import { mapState, mapMutations } from "vuex";
         return len;
       },
       //编辑名称
-      editNameFn(e, flag){
+      editNameFn(e){
         e.cancelBubble =true;
         e.stopPropagation()
-        this.editflag = flag;
+        this.editflag = true;
       }
     },
     mounted(){
       var this_= this;
       document.title = '编辑图书';
-      this_.book = this_.bookinfo;
-      this_.bookname = this_.bookinfo.book_name;
-      this_.bookauthor = this_.bookinfo.author;
-      this_.getBookDetailInfoFn(this_.token,this_.bookinfo.id);
+      this_.getBookInfo(this_.token, this_.bookinfo.id)
+      this_.getBookDetailInfoFn(this_.token, this_.bookinfo.id);
+    },
+    updated(){
+      var this_= this;
     },
     computed:{
       ...mapState(['token',"modeltypeid","modeltypename","modelid","bookinfo"])
@@ -219,51 +261,12 @@ import { mapState, mapMutations } from "vuex";
       }
       .book_name {
         position: absolute;
-        top: 1.6rem;
-        left: 1.4rem;
-        width: 60%;
-        height: 0.55rem;
+        width: 5.5rem;
+        height: 2rem;
+        left: 0.9rem;
+        top: 1rem;
+        margin-top: -3px;
         background: rgba(0,0,0,0);
-        vertical-align: middle;
-        text-align: center;
-
-        span {
-          font-size: 0.4rem;
-        }
-        span:nth-child(2) {
-          width: 0.5rem;
-          height: 0.5rem;
-          position: absolute;
-          padding-top: 0.06rem;
-          z-index: 20;
-          img {
-            width: 100%;
-          }
-        }
-      }
-      .book_author {
-        position: absolute;
-        top: 6.2rem;
-        left: 1.4rem;
-        width: 60%;
-        height: 0.55rem;
-        background: rgba(0,0,0,0);
-        vertical-align: middle;
-        text-align: center;
-
-        span {
-          font-size: 0.4rem;
-        }
-        span:nth-child(2) {
-          width: 0.5rem;
-          height: 0.5rem;
-          position: absolute;
-          padding-top: 0.06rem;
-          z-index: 20;
-          img {
-            width: 100%;
-          }
-        }
       }
       div{
         position: relative;
@@ -331,6 +334,46 @@ import { mapState, mapMutations } from "vuex";
           }
         }
       }
+    }
+  }
+  .bindgift_container {
+  //position: relative;
+    width: 5.5rem;
+    height: 3.6rem;
+    background: white;
+    border-radius: 8px;
+    h4 {
+      margin: 0.2rem;
+      font-size: 0.3rem;
+      color: #111;
+    }
+    .ps_input {
+      padding: 0.1rem 0.3rem;
+      box-sizing: border-box;
+      height: 0.8rem;
+      input {
+        width: 80%;
+        height: 100%;
+        border-radius: 5px;
+        border: 0;
+        -webkit-appearance: none;
+        border: 1px solid #ccc;
+        padding-left: 0.2rem;
+        color: #999;
+        box-sizing: border-box;
+      }
+    }
+    .sure_btn {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      height: 0.8rem;
+      line-height: 0.8rem;
+      background: #ff4747;
+      color: #fff;
+      font-size: 0.3rem;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
     }
   }
   .btn_container{

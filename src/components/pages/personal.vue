@@ -67,7 +67,7 @@ export default {
       bookflag:true, //书架不为空
       bookflag2:true,//书架数量小于2
       editflag:false, //不可编辑
-      username:"", 
+      username:"",
       userInfo:{}, //用户信息
       booklists:[] , //书架图书列表
       bookOne:{}, //展示的第一个
@@ -97,7 +97,7 @@ export default {
         if(res.data.code ==0){
           if(res.data.data){
             this_.booklists=res.data.data;
-            
+
             if(this_.booklists.length){
               this_.bookOne=this_.booklists[0];
               if(this_.booklists.length>1){
@@ -138,11 +138,9 @@ export default {
         message: '确定要删除此相册吗？'
       }).then(() => {
         var paramsobj={
-          service: "setBook",
+          service: "setBookStatus",
           id: this_.booklists[0].id,
           stoken: this_.token,
-          book_name: this_.booklists[0].book_name,
-          author: this_.booklists[0].author,
           status: status
         };
         SERVERUTIL.base.baseurl(paramsobj).then(res => {
@@ -164,27 +162,27 @@ export default {
       this_.changeModelId(this_.bookOne.template_id);
       this_.changeModelName(this_.bookOne.book_name);
       this_.changeBookInfo(this_.bookOne);
-      this.$router.push({  
+      this.$router.push({
         path: '/savesuccess',
-        name: 'SAVESUCCESS',  
-        params: {   
+        name: 'SAVESUCCESS',
+        params: {
           title:"预览"
         }
-      }) 
+      })
     },
     //编辑图书 -- 跳转到保存页面，不过是可以编辑
     jumptosave(obj){
       var this_ = this;
       this_.changeBookInfo(obj);
-      this_.$router.push({  
+      this_.$router.push({
         path: '/editimg',
-        name: 'EDITIMG' 
+        name: 'EDITIMG'
       });
     },
     //跳转到我的书架更多
     jumptobook(){
       var this_ = this;
-      this_.$router.push({  
+      this_.$router.push({
         path: '/mybook',
         name: 'MYBOOK'
       });
@@ -192,20 +190,20 @@ export default {
     //跳转到订单页面
     jumptoorder(id){
       var this_ = this;
-      this_.$router.push({  
+      this_.$router.push({
         path: '/order',
         name: 'ORDER',
-        params: {   
+        params: {
           id:id,
           token: this_.token
-        }, 
+        },
       });
     },
     //跳转到地址页面
     jumptoaddress(flag){
       var this_ = this;
       this_.changeEnter(true);
-      this_.$router.push({  
+      this_.$router.push({
         path: '/newaddress',
         name: 'NEWADDRESS'
       });
@@ -220,7 +218,7 @@ export default {
       }else{
         flag=false;
       }
-      this_.$router.push({  
+      this_.$router.push({
         path: '/giftzero',
         name: 'GIFTZERO',
         params:{
@@ -372,7 +370,7 @@ export default {
     margin-top: 0.4rem;
     padding: 0 0.3rem 0 0.5rem;
     box-sizing: border-box;
-    
+
     h4{
       margin-bottom:0.3rem;
       font-size:0.3rem;

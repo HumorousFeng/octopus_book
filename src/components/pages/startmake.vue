@@ -29,20 +29,9 @@
                 <van-col span="8">
                   <span class="onload_icon d-i-b">
                     <!-- <form ref="form"></form> -->
-                    <!--<van-uploader :after-read="onRead"  :accept="imgData.accept" multiple multiple-size="5" class="fileImage" v-if="leftnum>0">-->
-                      <!--<van-icon name="photograph" />-->
-                    <!--</van-uploader>-->
-                    <vue-core-image-upload
-                        class="fileImage"
-                        :crop="false"
-                        @imagechanged="onRead"
-                        :max-file-size="5242880"
-                        :multiple="true"
-                        :multiple-size="4"
-                        :url="uploadUrl"
-                        >
-                    </vue-core-image-upload>
-
+                    <van-uploader :after-read="onRead" accept="image/*" multiple class="fileImage" v-if="leftnum>0">
+                      <van-icon name="photograph" />
+                    </van-uploader>
                     <img src="../../images/onload.png" alt="上传" @click="completeFn()">
                     <span v-if="leftnum>0" class="mark tc" v-text="leftnum"></span>
                   </span>
@@ -91,7 +80,7 @@
                 <van-col span="8">
                   <span class="onload_icon d-i-b" @click="markflag=true;">
                     <!-- <form ref="form">  </form> -->
-                      <van-uploader :after-read="onRead" :accept="imgData.accept" multiple class="fileImage" v-if="leftnum>0">
+                      <van-uploader :after-read="onRead" accept="image/*" multiple class="fileImage" v-if="leftnum>0">
                         <van-icon name="photograph" />
                       </van-uploader>
                     <img src="../../images/onload.png" alt="上传" @click="completeFn()">
@@ -166,7 +155,7 @@
             </van-col>
             <van-col span="12">
               <van-button  class=" w100 ft14" type="default"  bottom-action style="background:none;font-size:0.28rem;color:black;">继续上传</van-button >
-               <van-uploader :after-read="nextonRead" :accept="imgData.accept" multiple class="fileImage">
+               <van-uploader :after-read="nextonRead" accept="image/*" multiple class="fileImage">
                   <van-icon name="photograph" />
               </van-uploader>
             </van-col>
@@ -219,9 +208,6 @@ export default {
       noprefactflag:false,  //清晰度不高的弹框
       nofitnum: 0,   //不合格的数量
       fileList: [],  //不合格的图片的数据集
-      imgData: {
-        accept: "image/*"
-      },
       bookinfos:{}, //获取到的图书的信息
       makenum:0,  //制作成功的数量
       loadflag:false,  //判断是否点击了上传按钮
@@ -504,9 +490,6 @@ export default {
       var this_ = this;
       var morenum = file.length || 1;
       var message = "";
-
-      console.log(file[0]);
-      return;
 
       //如果是从保存页面返回的，有之前保存的图片的情况
       if(morenum > this_.leftnum) {
