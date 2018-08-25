@@ -17,7 +17,7 @@
            <van-button bottom-action class="btn_share" @click="shareFriendFn">分享</van-button>
          </van-col>
          <van-col span="12">
-            <van-button  bottom-action class="btn_make" @click="markflag=true;">制作相册</van-button>
+            <van-button  bottom-action class="btn_make" @click="markflag=true;">制作图书</van-button>
          </van-col>
        </van-row>
      </div>

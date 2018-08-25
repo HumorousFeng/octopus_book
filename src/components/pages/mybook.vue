@@ -11,7 +11,7 @@
             <span class="preview_photo d-i-b" @click="previewFn(item)"></span>
             <span class="edit_photo d-i-b" @click="jumptosave(item)"></span>
           </div>
-          <div class="use_photo tc" @click="jumptostartmakeFn(item)">制作相册</div>
+          <div class="use_photo tc" @click="jumptostartmakeFn(item)">制作图书</div>
         </van-col>
       </van-row>
  </div>
