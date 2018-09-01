@@ -236,7 +236,6 @@ export default {
           }
         }
       }).catch(error => {
-          this_.$toast.clear();
         console.log(error);
       });
     },
@@ -267,7 +266,6 @@ export default {
           }
         }
       }).catch(error => {
-        this_.$toast.clear();
         console.log(error);
       });
     },
@@ -276,7 +274,7 @@ export default {
       var this_ = this;
       if(obj.template_id == this_.modelid){
         this_.$toast({
-          mask: false,
+          mask: true,
           message: "该模板已被选中",
           duration:1000
         });
@@ -301,7 +299,7 @@ export default {
     changeNewMode(obj){
       var this_ = this;
       this_.$toast.loading({
-        mask: false,
+        mask: true,
         message: "正在更换模板...",
         duration: 1000
       });
@@ -338,7 +336,7 @@ export default {
       this_.modeltypevalue = value;
       this_.activeNames='';
       this_.$toast.loading({
-        mask: false,
+        mask: true,
         message: "正在更换模板类型...",
       });
       this_.modelListFn(id);
@@ -449,29 +447,29 @@ export default {
 
             console.log(index);
             //每上传一张图片，创建一次图书
-            setTimeout(function() {
+            this_.checktimer = setTimeout(function() {
               this_.$toast.loading({
                 mask: true,
                 forbidClick: true,
                 message: "上传照片"+ index +"/"+ count,
-                duration: 0
+                duration: 30000
               });
               this_.makeModelFn(imgurl);
-            }, index*600);
+            }, index*660);
             if(index == count){
-              setTimeout(function(){
+              this_.checktimer = setTimeout(function(){
                 this_.$toast.loading({
                   mask: true,
                   forbidClick: true,
-                  message: "正在制作图书...",
-                  duration: 0
+                  message: "正在制作图书",
+                  duration: 30000
                 });
                 this_.getBookDetailInfoFn(this_.bookinfo.id, this_.token, true);
               },count*1000);
             }
           }else{
             this_.$toast({
-              mask: false,
+              mask: true,
               message: res.message || res.detail
             });
           }
@@ -517,6 +515,12 @@ export default {
       }else{ //只上传一张
         this_.makeFileList(file, 1);
       }
+      this_.$toast.loading({
+        mask: true,
+        forbidClick: true,
+        message: "正在检查照片...",
+        duration: 1000
+      });
       this_.checkImage(morenum);
     },
     makeFileList(file, index){
@@ -542,21 +546,15 @@ export default {
     checkImage(morenum){
       var this_ = this;
       if(this_.fileList.length != morenum){
-        setTimeout(function(){
-          this_.$toast.loading({
-            mask: false,
-            forbidClick: true,
-            message: "正在检查照片",
-            duration: 0
-          });
+        this_.checktimer = setTimeout(function(){
           this_.checkImage(morenum)
-        },200);
+        }, 200);
       }else{
-        this_.$toast.clear();
+        // this_.$toast.clear();
         if(this_.nofitnum > 0){
           this_.nofitflag = true;
         }else{
-          this_.uploadImgStart();
+          this_.uploadImgStart()
         }
       }
     },
@@ -579,18 +577,21 @@ export default {
           mask: true,
           forbidClick: true,
           message: "上传照片1/"+ morenum,
-          duration: 0
+          duration: 30000
         });
-        list.forEach((item,index)=>{
-          this_.uploadImg(item,index+1,morenum);
-        });
+
+        this_.checktimer = setTimeout(function () {
+          list.forEach((item,index)=>{
+            this_.uploadImg(item,index+1,morenum);
+          });
+        }, 1000);
       }
     },
     //当上传的图片数已满时，继续上传的操作 提示不可再传
     completeFn(){
       var this_ = this;
       this_.$toast({
-        mask: false,
+        mask: true,
         forbidClick:true,
         message: "已全部上传完毕,可点击保存相册",
         duration:1000
@@ -637,13 +638,13 @@ export default {
       this_.$toast.loading({
         mask: true,
         forbidClick: true,
-        message: "正在制作图书...",
-        duration: 0
+        message: "正在制作图书",
+        duration: 30000
       });
       if(count > 10){
         this_.$toast.clear();
         this_.getBookStatusFn(this_.bookinfo.id,this_.token);
-        return;
+        return false;
       }
       var num = 0;
       this_.modelLists.forEach(item=>{
@@ -724,7 +725,7 @@ export default {
       if(this_.leftnum > 0){
         if(this_.finishnum == 0){
           this_.$toast({
-            mask: false,
+            mask: true,
             message: "请先选择上传图片",
           });
           return false;
@@ -732,7 +733,7 @@ export default {
         if(sure){
           this_.nosucceeflag = false;
           this_.$toast.loading({
-            mask: false,
+            mask: true,
             message: "正在提交模板...",
           });
         }else{
@@ -740,7 +741,7 @@ export default {
         }
       }else{
         this_.$toast.loading({
-          mask: false,
+          mask: true,
           message: "正在提交模板...",
         });
         setTimeout(() => {
