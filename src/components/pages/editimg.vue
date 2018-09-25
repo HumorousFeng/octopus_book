@@ -37,7 +37,7 @@
     <van-popup v-model="editflag" class="bindgift_container" :overlay-style = "overstyleObj" >
       <div >
         <h4 class="tc">编辑书名</h4>
-        <div class="ps_input">书&nbsp;&nbsp;&nbsp;名：<input type="text" v-model="bookname" placeholder="请输入书名"></div>
+        <div class="ps_input">书&ensp;&ensp;名：<input type="text" v-model="bookname" placeholder="请输入书名"></div>
         <div class="ps_input">作者名：<input type="text" v-model="bookauthor" placeholder="请输入作者名"></div>
         <div class="sure_btn tc" @click="changeNameFn">确定</div>
       </div>

@@ -134,6 +134,22 @@ export default new Router({
         title: '物流详情'
       }
     },
+    {
+      path: '/aboutus',
+      name: 'ABOUTUS',
+      component: resolve => require(['@/components/pages/aboutus'],resolve),
+      meta: {
+        title: '关于我们'
+      }
+    },
+    {
+      path: '/contactus',
+      name: 'CONTACTUS',
+      component: resolve => require(['@/components/pages/contactus'],resolve),
+      meta: {
+        title: '联系我们'
+      }
+    }
   ]
 })
 
