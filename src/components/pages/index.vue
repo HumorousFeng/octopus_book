@@ -216,7 +216,7 @@ import { mapState, mapMutations } from "vuex";
           margin: 0.3rem 0 0 0;
           img{
             width: 100%;
-            height: 4.1rem; 
+            height: 4.6rem;
             margin-bottom: 0.2rem;
             // border: 1px solid black;
             border-radius: 8px;
