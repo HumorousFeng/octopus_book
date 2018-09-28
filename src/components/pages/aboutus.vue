@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import UTILS from "../../lib/utils";
 import { mapState, mapMutations } from "vuex";
   export default {
     data(){
@@ -41,16 +42,21 @@ import { mapState, mapMutations } from "vuex";
         });
       },
       ...mapMutations([
-        "changeModelTypeId"
+        "changeModelTypeId","changeToken"
       ])
     },
     mounted(){
       var this_ = this;
       document.title = '关于我们';
-
+      if(!this_.token){
+        var str=window.location.href;
+        var obj = UTILS.PARAMSREG.paramsregurl(str);
+        this_.changeToken(obj["stoken"]);
+        localStorage.setItem('token', obj['stoken']);
+      };
     },
     computed:{
-      ...mapState([])
+      ...mapState(["token"])
     }
   }
 </script>

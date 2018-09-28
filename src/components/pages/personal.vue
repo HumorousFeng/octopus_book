@@ -282,6 +282,7 @@ export default {
       var str=window.location.href;
       var obj = UTILS.PARAMSREG.paramsregurl(str);
       this_.changeToken(obj["stoken"]);
+      localStorage.setItem('token', obj['stoken']);
     };
     this_.getUserInfoFn(this_.token);
     this_.getBookListFn(this_.token);
