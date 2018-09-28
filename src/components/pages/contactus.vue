@@ -21,16 +21,21 @@
     methods:{
 
       ...mapMutations([
-
+        "changeToken"
       ])
     },
     mounted(){
       var this_ = this;
       document.title = '联系我们';
-
+      if(!this_.token){
+        var str=window.location.href;
+        var obj = UTILS.PARAMSREG.paramsregurl(str);
+        this_.changeToken(obj["stoken"]);
+        localStorage.setItem('token', obj['stoken']);
+      };
     },
     computed:{
-      ...mapState([])
+      ...mapState(["token"])
     }
   }
 </script>
